@@ -26,11 +26,9 @@ ensure_ansible () {
             SUITCASE_ANSIBLE_REQUIREMENTS=requirements.yml \
             bash -x
     fi
-    export PATH="$PWD/ansible-deps-cache/bin:$PATH"
-    export ANSIBLE_ROLES_PATH="$PWD/ansible-deps-cache/roles"
-    export ANSIBLE_COLLECTIONS_PATHS="$PWD/ansible-deps-cache"
 
     . "$PWD"/ansible-deps-cache/lib.sh
+    ensure_ansible_runtime
 }
 
 inventories () {
@@ -41,8 +39,7 @@ inventories () {
 
 ensure_ansible
 ensure_tkgi svc0176idevfsdkt0001 tkgi.epfl.ch ./tkgi-EPFL-CA.crt
-ensure_platform_quirks
-playbook_flag_homedir xaasible_dir
+playbook_flags="$(ansible_flag_set_var_homedir xaasible_dir)"
 
 mode=ansible-playbook
 
