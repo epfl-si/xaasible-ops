@@ -1,3 +1,9 @@
+- name: "xaas-ingress: route HTTP traffic within the cluster"
+  hosts: all
+  gather_facts: no
+  roles:
+    - role: roles/xaas-ingress
+
 - name: "xaas-build: build in the cloud"
   hosts: all
   gather_facts: no

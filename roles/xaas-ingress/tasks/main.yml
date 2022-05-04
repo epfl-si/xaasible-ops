@@ -1,0 +1,9 @@
+- name: nginx ingress-controller
+  include_tasks:
+    file: nginx-tasks.yml
+    apply:
+      tags:
+        - nginx
+  tags:
+    - nginx
+
