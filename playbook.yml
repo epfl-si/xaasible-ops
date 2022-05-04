@@ -1,0 +1,5 @@
+- name: "xaas-build: build in the cloud"
+  hosts: all
+  gather_facts: no
+  roles:
+    - role: roles/xaas-build
