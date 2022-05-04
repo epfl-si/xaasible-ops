@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# This is a wrapper around ansible / ansible-playbook.
+#
+# Usage ("ansible" mode):
+#
+#   ./xaasible -m raw all -a 'date'
+#
+# Usage ("ansible-playbook" mode):
+#
+#   ./xaasible -l prod
+#
+#
+# If you are unfamiliar with Ansible, read up on it at
+# - https://www.ansible.com/overview/how-ansible-works
+# - https://github.com/jdauphant/awesome-ansible
+
+cd "$(dirname "$0")"; cd "$(/bin/pwd)"
+
+ensure_ansible () {
+    if ! test -f ansible-deps-cache/.versions 2>/dev/null; then
+        curl https://raw.githubusercontent.com/epfl-si/ansible.suitcase/master/install.sh | \
+            SUITCASE_DIR=$PWD/ansible-deps-cache \
+            SUITCASE_PIP_EXTRA="bcrypt passlib" \
+            SUITCASE_ANSIBLE_VERSION=5.6.0 \
+            SUITCASE_ANSIBLE_REQUIREMENTS=requirements.yml \
+            bash -x
+    fi
+    export PATH="$PWD/ansible-deps-cache/bin:$PATH"
+    export ANSIBLE_ROLES_PATH="$PWD/ansible-deps-cache/roles"
+    export ANSIBLE_COLLECTIONS_PATHS="$PWD/ansible-deps-cache"
+
+    . "$PWD"/ansible-deps-cache/lib.sh
+}
+
+inventories () {
+    echo "-i inventory.yml"
+}
+
+###########################################################################
+
+ensure_ansible
+ensure_tkgi svc0176idevfsdkt0001 tkgi.epfl.ch ./tkgi-EPFL-CA.crt
+ensure_platform_quirks
+playbook_flag_homedir xaasible_dir
+
+mode=ansible-playbook
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+        kubectl)
+            mode="kubectl"
+            shift ; break ;;
+        -m) mode=ansible
+            ansible_args+=("-m")
+            shift ;;
+        *)
+            ansible_args+=("$1")
+            shift ;;
+    esac
+done
+
+set -e
+
+case "$mode" in
+    ansible-playbook)
+        ansible-playbook $playbook_flags $(inventories) "${ansible_args[@]}" \
+                         playbook.yml
+        ;;
+    ansible)
+        ansible $(inventories) "${ansible_args[@]}"
+        ;;
+    kubectl)
+        kubectl "$@" ;;
+esac
