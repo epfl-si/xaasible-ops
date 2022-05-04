@@ -1,5 +1,10 @@
-- name: Add stable chart repo
+- name: Import ingress-nginx Helm repository
   kubernetes.core.helm_repository:
     name: stable
     repo_url: "https://kubernetes.github.io/ingress-nginx"
 
+- name: Deploy nginx
+  kubernetes.core.helm:
+    name: nginx-ingress
+    chart_ref: stable/ingress-nginx
+    release_namespace: nginx-ingress
