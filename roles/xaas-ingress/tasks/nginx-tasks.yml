@@ -16,7 +16,7 @@
 
 - name: Import ingress-nginx Helm repository
   kubernetes.core.helm_repository:
-    name: stable
+    name: ingress-nginx
     repo_url: "https://kubernetes.github.io/ingress-nginx"
 
 - name: Deploy nginx with Helm
