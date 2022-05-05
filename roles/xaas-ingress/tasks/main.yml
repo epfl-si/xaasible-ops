@@ -1,3 +1,11 @@
+- include_vars: "{{ item }}"
+  tags: always
+  with_items:
+    - nginx-vars.yml
+    - vars/entrypoints.yml
+    - vars/common-vars.yml
+
+
 - name: nginx ingress-controller
   include_tasks:
     file: nginx-tasks.yml
@@ -6,4 +14,5 @@
         - nginx
   tags:
     - nginx
+    - nginx.wipe
 

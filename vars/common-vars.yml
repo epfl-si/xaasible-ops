@@ -1,0 +1,3 @@
+xaasible_kubeconfig_path: "{{ xaasible_dir }}/ansible-deps-cache/kubeconfig/kubeconfig"
+xaasible_kubectl: "env KUBECONFIG={{ xaasible_kubeconfig_path }} kubectl"
+xaasible_helm: "env KUBECONFIG={{ xaasible_kubeconfig_path }} helm"
