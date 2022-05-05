@@ -16,8 +16,9 @@ A standard DSI-TKGI cluster comes with [contour](https://projectcontour.io) inst
 
 ```mermaid
 graph LR
-   kind-Ingress[Kubernetes Ingress objects] --> ingress-controller{Ingress controller}
-   ingress-controller --> config-files[Some configuration files for <br/>HAProxy, or Envoy, or nginx, or...]
+   kind-Ingress[Kubernetes <code>Ingress</code> objects] --> ingress-controller{Ingress controller}
+   ingress-controller --> config-files["Configuration file(s)"]
+   config-files --> pod{"Envoy <br/>(or HAProxy, nginx, ...)"}
 ```
 
 This choice, decided between Camptocamp and ITOP-SDDC for lack of a suitable, working solution from the vendor, has several drawbacks for us:
@@ -37,16 +38,16 @@ Because DevOps teams are not granted permissions to create “expensive” objec
 - delete useless namespaces (such as the whole `projectcontour`),
 - create new ones (`nginx-ingress`, whose poorly-chosen name we decided to keep for the reason that follows:)
 
-These operations must currently be performed “in day 2” by clicking inside portal-xaas.epfl.ch. This might change in the future with a better implementation of the aforementioned “defenses” (i.e. by deploying an [admission controller](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/), rather than the current approach which is based on locking down namespaces with RBAC and `Quota` before handing them over to DevOps teams)
+These operations must currently be performed “in day 2” by clicking inside portal-xaas.epfl.ch. This might change in the future with a better implementation of the aforementioned “defenses” (i.e. when ITOP-SDDC deploys an [admission controller](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/), rather than the current approach which is based on locking down namespaces with RBAC and `Quota` before handing them over to DevOps teams).
 
-Owing to the very same restrictions, there are some changes that the nginx Helm chart wants to do, but can't, such as:
+Owing to the same permission restrictions mentioned above, there are changes that the nginx Helm chart wants to do, but can't, such as:
 - altering `ClusterRole` objects in the pre-install hook
 - setting up admission webhooks
 
 Fortunately, the nginx Helm chart offers suitable configuration options (`helm --set` / `kubernetes.core.helm` → `values`) to side-step these concerns.
 
-And finally, the EPFL security teams frowns upon
-- running nginx as the root user
-- ~~binding on reserved ports~~ This has now been fixed by granting `CAP_NET_BIND_SERVICE` to pods that request it
+And finally, the EPFL security team frowns upon
+- running pods as the root user
+- ~~binding on reserved ports~~<sup>This has now been fixed by granting `CAP_NET_BIND_SERVICE` at will</sup>
 
-But the Helm chart offers suitable workarounds for that as well.
+... but the Helm chart offers a suitable workaround for the first of these points as well.
