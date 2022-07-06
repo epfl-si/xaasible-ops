@@ -5,7 +5,6 @@
     - vars/entrypoints.yml
     - vars/common-vars.yml
 
-
 - name: nginx ingress-controller
   include_tasks:
     file: nginx-tasks.yml
@@ -15,4 +14,3 @@
   tags:
     - nginx
     - nginx.wipe
-

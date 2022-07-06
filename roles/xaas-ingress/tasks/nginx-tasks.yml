@@ -24,12 +24,13 @@
     name: "{{ nginx_ingress_helm_install_name }}"
     chart_ref: "{{ nginx_helm_chart }}"
     release_namespace: "{{ nginx_ingress_namespace }}"
+    create_namespace: yes
     values:
       controller:
         service:
           loadBalancerIP: "{{ nginx_loadbalancer_ip }}"
         # We (manually) kicked out the whole Contour, so we want to handle all Ingress objects:
-        watchIngressWithoutClass: true
+        ### watchIngressWithoutClass: true
         # Because of DSI-TKGI restrictions, we have to turn these off:
         admissionWebhooks:
           enabled: false
