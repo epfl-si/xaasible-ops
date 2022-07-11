@@ -19,6 +19,7 @@
     name: ingress-nginx
     repo_url: "https://kubernetes.github.io/ingress-nginx"
 
+# See https://github.com/kubernetes/ingress-nginx/blob/main/charts/ingress-nginx/values.yaml
 - name: Deploy nginx with Helm
   kubernetes.core.helm:
     name: "{{ nginx_ingress_helm_install_name }}"
@@ -27,6 +28,9 @@
     create_namespace: yes
     values:
       controller:
+        image:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
         service:
           loadBalancerIP: "{{ nginx_loadbalancer_ip }}"
         # We (manually) kicked out the whole Contour, so we want to handle all Ingress objects:
@@ -34,8 +38,10 @@
         # Because of DSI-TKGI restrictions, we have to turn these off:
         admissionWebhooks:
           enabled: false
+          patch:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+      defaultBackend:
         image:
           allowPrivilegeEscalation: false
-      # Ditto re: permissions:
-      rbac:
-        create: false
+          runAsNonRoot: true
