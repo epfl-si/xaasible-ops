@@ -1,0 +1,18 @@
+- include_vars: "{{ item }}"
+  tags: always
+  with_items:
+    - monitoring-vars.yml
+    - vars/entrypoints.yml
+    - vars/common-vars.yml
+
+- name: kube prometheus stack 
+  include_tasks:
+    file: prometheus-tasks.yml
+    apply:
+      tags:
+        - monitoring
+        - prometheus
+  tags:
+    - monitoring
+    - prometheus
+    - prometheus.wipe

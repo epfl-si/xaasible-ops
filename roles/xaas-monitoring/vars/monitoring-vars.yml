@@ -1,0 +1,4 @@
+monitoring_namespace: monitoring
+prometheus:
+  helm_install_name: epfl-kube-prometheus-stack
+  helm_chart: prometheus-community/kube-prometheus-stack
