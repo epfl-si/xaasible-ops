@@ -15,3 +15,9 @@
   gather_facts: no
   roles:
     - role: roles/xaas-build
+
+- name: "xaas-servicemesh: communicate with MySQL, or something"
+  hosts: all
+  gather_facts: no
+  roles:
+    - role: roles/xaas-servicemesh
