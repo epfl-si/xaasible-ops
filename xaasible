@@ -38,6 +38,8 @@ inventories () {
 
 ###########################################################################
 
+set -e
+
 ensure_ansible
 ensure_tkgi svc0176idevfsdkt0001 tkgi.epfl.ch ./tkgi-EPFL-CA.crt
 playbook_flags="$(ansible_flag_set_var_homedir xaasible_dir)"
@@ -57,8 +59,6 @@ while [ "$#" -gt 0 ]; do
             shift ;;
     esac
 done
-
-set -e
 
 case "$mode" in
     ansible-playbook)
