@@ -8,12 +8,12 @@ metadata:
 ---
 
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: satosa
   namespace: {{ satosa_namespace }}
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       service: satosa
@@ -24,9 +24,25 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
+        runAsUser: {{ satosa_run_as_user }}
       containers:
         - name: satosa
           image: {{ satosa_image }}
       ports:
         - containerPort: 8080
           name: http
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: satosa
+  namespace: {{ satosa_namespace }}
+data:
+  openid_connect_frontend.yaml: |
+    {{ lookup("template", "satosa-modules/openid_connect_frontend.yaml") | indent(4) }}
+  static_attributes_microservice.yaml: |
+    {{ lookup("template", "satosa-modules/static_attributes_microservice.yaml") | indent(4) }}
+  saml2_backend.yaml: |
+    {{ lookup("template", "satosa-modules/saml2_backend.yaml") | indent(4) }}

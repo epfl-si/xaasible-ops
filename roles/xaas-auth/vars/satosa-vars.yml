@@ -1,2 +1,16 @@
 satosa_namespace: satosa-system
 satosa_image: satosa:8
+# `docker run --rm satosa:8 id` says that the user `satosa` has ID 1000 in the image:
+satosa_run_as_user: 1000
+
+# The host name under which the SATOSA front-end side is reachable
+satosa_hostname: satosa-fsd.epfl.ch
+
+satosa_log_level: DEBUG
+
+satosa_tech_support_email: dominique.quatravaux@epfl.ch
+satosa_tequila_hostname_short: tequila
+satosa_tequila_hostname: '{{ satosa_tequila_hostname_short }}.epfl.ch'
+
+satosa_tequila_saml_entity_id: https://esign-login.epfl.ch/saml/metadata
+satosa_tequila_saml_metadata_url: 'https://{{ satosa_tequila_hostname }}/metadata.{{ satosa_tequila_hostname_short }}-IDP.xml'

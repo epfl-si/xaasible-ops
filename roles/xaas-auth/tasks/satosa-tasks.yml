@@ -1,6 +1,21 @@
 - tags: always
   include_vars: satosa-vars.yml
 
+- name: Generate '{{ satosa_keybase.oidc_private_key }}'
+  shell:
+    creates: '{{ satosa_keybase.oidc_private_key }}'
+    cmd:
+      openssl genrsa 2048 > {{ satosa_keybase.oidc_private_key }}
+
+- name: Generate '{{ satosa_keybase.oidc_certificate }}'
+  shell:
+    creates: '{{ satosa_keybase.oidc_certificate }}'
+    cmd: >-
+      openssl req -x509 -new -key {{ satosa_keybase.oidc_private_key }}
+      -batch -subj '/CN={{ satosa_hostname }}'
+      -days 3650
+      -out {{ satosa_keybase.oidc_certificate }}
+
 - name: SATOSA Kubernetes objects
   kubernetes.core.k8s:
     definition: '{{ item }}'
