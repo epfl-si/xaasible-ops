@@ -1,0 +1,9 @@
+- tags: always
+  include_vars: satosa-vars.yml
+
+- name: SATOSA Kubernetes objects
+  kubernetes.core.k8s:
+    definition: '{{ item }}'
+  with_items: >-
+    {{ lookup('template', 'satosa-k8s-objects.yaml')
+    | from_yaml_all }}

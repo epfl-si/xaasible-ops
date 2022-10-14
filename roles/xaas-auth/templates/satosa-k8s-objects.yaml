@@ -1,0 +1,32 @@
+# Kubernetes objects to run SATOSA in a cluster
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ satosa_namespace }}
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: satosa
+  namespace: {{ satosa_namespace }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      service: satosa
+  template:
+    metadata:
+      labels:
+        service: satosa
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: satosa
+          image: {{ satosa_image }}
+      ports:
+        - containerPort: 8080
+          name: http
