@@ -6,12 +6,11 @@ cookies_samesite_compat:
     - SATOSA_STATE_LEGACY
 INTERNAL_ATTRIBUTES: internal_attributes.yaml
 BACKEND_MODULES:
-  - plugins/backends/saml2_backend.yaml
+  - /config/saml2_backend.yaml
 FRONTEND_MODULES:
-  - plugins/frontends/saml2_frontend.yaml
-  - plugins/frontends/ping_frontend.yaml
+  - /config/openid_connect_frontend.yaml
 MICRO_SERVICES:
-  - plugins/microservices/static_attributes.yaml
+  - /config/static_attributes_microservice.yaml
 LOGGING:
   version: 1
   formatters:

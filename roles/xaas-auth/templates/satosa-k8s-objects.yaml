@@ -7,8 +7,8 @@ metadata:
 
 ---
 
-apiVersion: apps/v1
-kind: StatefulSet
+apiVersion: v1
+kind: Deployment
 metadata:
   name: satosa
   namespace: {{ satosa_namespace }}
@@ -28,9 +28,19 @@ spec:
       containers:
         - name: satosa
           image: {{ satosa_image }}
+          volumeMounts:
+            - name: config
+              subPath: proxy_conf.yaml
+              mountPath: /etc/satosa/proxy_conf.yaml
+            - name: config
+              mountPath: /config
       ports:
         - containerPort: 8080
           name: http
+      volumes:
+        - name: config
+          configMap:
+            name: satosa
 
 ---
 
@@ -40,6 +50,8 @@ metadata:
   name: satosa
   namespace: {{ satosa_namespace }}
 data:
+  proxy_conf.yaml: |
+    {{ lookup("template", "proxy_conf.yaml") | indent(4) }}
   openid_connect_frontend.yaml: |
     {{ lookup("template", "satosa-modules/openid_connect_frontend.yaml") | indent(4) }}
   static_attributes_microservice.yaml: |
