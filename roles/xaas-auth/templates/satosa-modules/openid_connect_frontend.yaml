@@ -7,3 +7,4 @@ config:
     response_types_supported: ["code", "id_token token"]
     subject_types_supported: ["pairwise"]
     scopes_supported: ["openid", "email"]
+  signing_key_path: /signing-keys/oidc.key
