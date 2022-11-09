@@ -56,7 +56,6 @@
 - name: SATOSA Kubernetes objects
   kubernetes.core.k8s:
     definition: '{{ item }}'
-    ssl_ca_cert: /tmp/CA-chain.crt
   with_items: >-
     {{ lookup('template', 'satosa-k8s-objects.yaml')
     | from_yaml_all }}

@@ -15,9 +15,9 @@ satosa_tequila_hostname: '{{ satosa_tequila_hostname_short }}.epfl.ch'
 satosa_keybase:
   oidc_private_key: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/frontend.key
   oidc_certificate: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/frontend.crt
-  # TODO: use our own set of keys (here) and SAML identities (below)
-  saml_private_key: /keybase/team/epfl_esign/satosa/ssl/backend.key
-  saml_certificate: /keybase/team/epfl_esign/satosa/ssl/backend.crt
+  saml_private_key: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/satosa-backend.key
+  saml_certificate: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/satosa-backend.crt
 
+# TODO: use our own set of SAML identities
 satosa_tequila_saml_entity_id: https://esign-login.epfl.ch/saml/metadata
 satosa_tequila_saml_metadata_url: 'https://{{ satosa_tequila_hostname }}/metadata.{{ satosa_tequila_hostname_short }}-IDP.xml'
