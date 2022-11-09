@@ -36,6 +36,16 @@ spec:
               mountPath: /config
             - name: signing-keys
               mountPath: /signing-keys
+          ## Uncomment the following lines to get a running (albeit useless) pod for debugging purposes:
+#          command:
+#            - bash
+#            - -c
+#            - "sleep 36000"
+          ## 💡 From a `kubectl exec` prompt, you can then run
+          ##
+          ##    /usr/local/bin/docker-entrypoint.sh gunicorn -b0.0.0.0:8080 satosa.wsgi:app
+          ##
+          ## to get the same behavior that the pod would normally run.
       ports:
         - containerPort: 8080
           name: http
