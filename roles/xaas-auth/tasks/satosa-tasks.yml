@@ -2,12 +2,14 @@
   include_vars: satosa-vars.yml
 
 - name: Generate '{{ satosa_keybase.oidc_private_key }}'
+  when: lookup("pipe", "test -d $(dirname %s) && echo YES || echo NO" % satosa_keybase.oidc_private_key) == "YES"
   shell:
     creates: '{{ satosa_keybase.oidc_private_key }}'
     cmd:
       openssl genrsa 2048 > {{ satosa_keybase.oidc_private_key }}
 
 - name: Generate '{{ satosa_keybase.oidc_certificate }}'
+  when: lookup("pipe", "test -d $(dirname %s) && echo YES || echo NO" % satosa_keybase.oidc_certificate) == "YES"
   shell:
     creates: '{{ satosa_keybase.oidc_certificate }}'
     cmd: >-
