@@ -1,5 +1,6 @@
 # Main configuration file for SATOSA
 BASE: https://{{ satosa_hostname }}/
+COOKIE_STATE_NAME: "SATOSA_STATE"
 
 cookies_samesite_compat:
   - - SATOSA_STATE
@@ -23,13 +24,6 @@ LOGGING:
       class: logging.StreamHandler
       stream: ext://sys.stdout
       level: {{ satosa_log_level }}
-      formatter: simple
-      class: logging.handlers.RotatingFileHandler
-      filename: satosa-info.log
-      encoding: utf8
-      maxBytes: 10485760
-      backupCount: 20
-      level: INFO
       formatter: simple
   loggers:
     satosa:
