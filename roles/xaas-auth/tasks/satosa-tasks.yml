@@ -5,8 +5,7 @@
   when: lookup("pipe", "test -d $(dirname %s) && echo YES || echo NO" % satosa_keybase.oidc_private_key) == "YES"
   shell:
     creates: '{{ satosa_keybase.oidc_private_key }}'
-    cmd:
-      openssl genrsa 2048 > {{ satosa_keybase.oidc_private_key }}
+    cmd: openssl genrsa 2048 > {{ satosa_keybase.oidc_private_key }}
 
 - name: Generate '{{ satosa_keybase.oidc_certificate }}'
   when: lookup("pipe", "test -d $(dirname %s) && echo YES || echo NO" % satosa_keybase.oidc_certificate) == "YES"
@@ -18,42 +17,6 @@
       -days 3650
       -out {{ satosa_keybase.oidc_certificate }}
 
-- name: SATOSA signing keys
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: satosa-saml-signing-keys
-        namespace: "{{ satosa_namespace }}"
-      type: Opaque
-      data:
-        satosa.key: >-
-          {{ lookup("pipe", "keybase fs read %s" % satosa_keybase.saml_private_key) | b64encode }}
-        satosa.crt: >-
-          {{ lookup("pipe", "keybase fs read %s" % satosa_keybase.saml_certificate) | b64encode }}
-        oidc.key: >-
-          {{ lookup("pipe", "keybase fs read %s" % satosa_keybase.oidc_private_key) | b64encode }}
-        oidc.crt: >-
-          {{ lookup("pipe", "keybase fs read %s" % satosa_keybase.oidc_certificate) | b64encode }}
-
-- name: Tequila certificate
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: satosa-tequila-certificate
-        namespace: "{{ satosa_namespace }}"
-      type: Opaque
-      data:
-        tequila.pem: |-
-          {{ lookup("pipe", "openssl s_client -connect {{ satosa_tequila_hostname }}:443 \
-                             -showcerts </dev/null 2>/dev/null | \
-                             sed -e '/END CERTIFICATE/q' 2>/dev/null | openssl x509")
-                   | b64encode }}
 
 - name: SATOSA Kubernetes objects
   kubernetes.core.k8s:

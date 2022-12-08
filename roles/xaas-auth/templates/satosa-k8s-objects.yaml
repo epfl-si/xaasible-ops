@@ -5,8 +5,39 @@ kind: Namespace
 metadata:
   name: {{ satosa_namespace }}
 
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: satosa-saml-signing-keys
+  namespace: '{{ satosa_namespace }}'
+type: Opaque
+data:
+  satosa.key: >-
+    {{ lookup("pipe", "keybase fs read %s" % satosa_keybase.saml_private_key) | b64encode | indent(4) }}
+  satosa.crt: >-
+    {{ lookup("pipe", "keybase fs read %s" % satosa_keybase.saml_certificate) | b64encode | indent(4) }}
+  oidc.key: >-
+    {{ lookup("pipe", "keybase fs read %s" % satosa_keybase.oidc_private_key) | b64encode | indent(4) }}
+  oidc.crt: >-
+    {{ lookup("pipe", "keybase fs read %s" % satosa_keybase.oidc_certificate) | b64encode | indent(4) }}
 ---
 
+apiVersion: v1
+kind: Secret
+metadata:
+  name: satosa-tequila-certificate
+  namespace: '{{ satosa_namespace }}'
+type: Opaque
+data:
+  tequila.pem: |-
+    {{ lookup("pipe", "openssl s_client -connect {{ satosa_tequila_hostname }}:443 \
+                       -showcerts </dev/null 2>/dev/null | \
+                       sed -e '/END CERTIFICATE/q' 2>/dev/null | openssl x509")
+             | b64encode | indent(4) }}
+
+---
 apiVersion: v1
 kind: Deployment
 metadata:
@@ -58,7 +89,6 @@ spec:
             secretName: satosa-saml-signing-keys
 
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -73,3 +103,40 @@ data:
     {{ lookup("template", "satosa-modules/static_attributes_microservice.yaml") | indent(4) }}
   saml2_backend.yaml: |
     {{ lookup("template", "satosa-modules/saml2_backend.yaml") | indent(4) }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: satosa
+  namespace: {{ satosa_namespace }}
+spec:
+  selector:
+    service: satosa
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: satosa
+  namespace: {{ satosa_namespace }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+spec:
+  rules:
+    - host: {{ satosa_hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: 
+                name: satosa
+                port: 
+                  number: 80
