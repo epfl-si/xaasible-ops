@@ -10,7 +10,7 @@ satosa_log_level: DEBUG
 
 satosa_tech_support_email: dominique.quatravaux@epfl.ch
 satosa_tequila_hostname_short: tequila
-satosa_tequila_hostname: '{{ satosa_tequila_hostname_short }}.epfl.ch'
+satosa_tequila_hostname: "{{ satosa_tequila_hostname_short }}.epfl.ch"
 
 satosa_keybase:
   oidc_private_key: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/frontend.key
@@ -20,4 +20,4 @@ satosa_keybase:
 
 # TODO: use our own set of SAML identities
 satosa_tequila_saml_entity_id: https://esign-login.epfl.ch/saml/metadata
-satosa_tequila_saml_metadata_url: 'https://{{ satosa_tequila_hostname }}/metadata.{{ satosa_tequila_hostname_short }}-IDP.xml'
+satosa_tequila_saml_metadata_url: "https://{{ satosa_tequila_hostname }}/metadata.{{ satosa_tequila_hostname_short }}-IdP.xml"
