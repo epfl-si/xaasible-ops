@@ -19,5 +19,5 @@ satosa_keybase:
   saml_certificate: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/satosa-backend.crt
 
 # TODO: use our own set of SAML identities
-satosa_tequila_saml_entity_id: https://esign-login.epfl.ch/saml/metadata
+satosa_tequila_saml_entity_id: https://tkgi-satosa.epfl.ch/saml/metadata
 satosa_tequila_saml_metadata_url: "https://{{ satosa_tequila_hostname }}/metadata.{{ satosa_tequila_hostname_short }}-IdP.xml"
