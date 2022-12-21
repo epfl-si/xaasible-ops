@@ -1,5 +1,5 @@
 # Main configuration file for SATOSA
-BASE: https://{{ satosa_hostname }}/
+BASE: {{ satosa_base_url }}
 COOKIE_STATE_NAME: "SATOSA_STATE"
 
 cookies_samesite_compat:
