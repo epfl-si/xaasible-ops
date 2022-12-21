@@ -59,6 +59,15 @@ spec:
       containers:
         - name: satosa
           image: {{ satosa_image }}
+          command:
+            - bash
+            - -x
+            - /config/custom-entrypoint.sh
+            ## Comment the above two lines and uncomment below
+            ## to force the container to start up (for debugging
+            ## purposes):
+            # - sleep
+            # - "36000"
           volumeMounts:
             - name: config
               subPath: proxy_conf.yaml
@@ -103,6 +112,8 @@ data:
     {{ lookup("template", "satosa-modules/static_attributes_microservice.yaml") | indent(4) }}
   saml2_backend.yaml: |
     {{ lookup("template", "satosa-modules/saml2_backend.yaml") | indent(4) }}
+  custom-entrypoint.sh: |
+    {{ lookup("template", "custom-entrypoint.sh") | indent(4) }}
 
 ---
 apiVersion: v1
