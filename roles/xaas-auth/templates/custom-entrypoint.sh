@@ -17,4 +17,4 @@ docker_pprint_metadata () {
 	mv backend.xml.new backend.xml
 }
 
-_main gunicorn -b0.0.0.0:8080 satosa.wsgi:app
+_main gunicorn -b0.0.0.0:8080 epfl.satosa_wsgi:app

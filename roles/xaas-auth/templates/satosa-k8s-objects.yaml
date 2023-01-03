@@ -74,6 +74,8 @@ spec:
               mountPath: /etc/satosa/proxy_conf.yaml
             - name: config
               mountPath: /config
+            - name: config
+              mountPath: /usr/local/lib/python3.10/epfl
             - name: signing-keys
               mountPath: /saml2-backend-secrets
           ## Uncomment the following lines to get a running (albeit useless) pod for debugging purposes:
@@ -114,6 +116,8 @@ data:
     {{ lookup("template", "satosa-modules/saml2_backend.yaml") | indent(4) }}
   custom-entrypoint.sh: |
     {{ lookup("template", "custom-entrypoint.sh") | indent(4) }}
+  satosa_wsgi.py: |
+    {{ lookup("template", "satosa_wsgi.py") | indent(4) }}
 
 ---
 apiVersion: v1
