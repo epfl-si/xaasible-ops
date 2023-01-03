@@ -8,3 +8,4 @@ config:
     subject_types_supported: ["pairwise"]
     scopes_supported: ["openid", "email"]
   signing_key_path: /saml2-backend-secrets/oidc.key
+  client_db_path: /config/clients.json

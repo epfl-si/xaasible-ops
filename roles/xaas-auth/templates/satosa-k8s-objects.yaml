@@ -118,7 +118,8 @@ data:
     {{ lookup("template", "custom-entrypoint.sh") | indent(4) }}
   satosa_wsgi.py: |
     {{ lookup("template", "satosa_wsgi.py") | indent(4) }}
-
+  clients.json: |
+    {{ lookup("template", "clients.json") | indent(4) }}
 ---
 apiVersion: v1
 kind: Service
