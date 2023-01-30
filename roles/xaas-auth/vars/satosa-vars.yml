@@ -8,7 +8,7 @@ satosa_hostname: tkgi-satosa.epfl.ch
 
 satosa_log_level: DEBUG
 
-satosa_tech_support_email: dominique.quatravaux@epfl.ch
+satosa_tech_support_email: 1234@epfl.ch
 satosa_tequila_hostname_short: tequila
 satosa_tequila_hostname: "{{ satosa_tequila_hostname_short }}.epfl.ch"
 
