@@ -18,6 +18,9 @@
   - key: "{{ satosa_keybase.oidc_private_key }}"
     cert: "{{ satosa_keybase.oidc_certificate }}"
     cn: "{{ satosa_hostname }}"
+  - key: "{{ satosa_keybase.saml_private_key }}"
+    cert: "{{ satosa_keybase.saml_certificate }}"
+    cn: "{{ satosa_hostname }}"
 - name: SATOSA Kubernetes objects
   kubernetes.core.k8s:
     definition: '{{ item }}'
