@@ -1,23 +1,23 @@
 - tags: always
   include_vars: satosa-vars.yml
 
-- name: Generate '{{ satosa_keybase.oidc_private_key }}'
-  when: lookup("pipe", "test -d $(dirname %s) && echo YES || echo NO" % satosa_keybase.oidc_private_key) == "YES"
-  shell:
-    creates: '{{ satosa_keybase.oidc_private_key }}'
-    cmd: openssl genrsa 2048 > {{ satosa_keybase.oidc_private_key }}
-
-- name: Generate '{{ satosa_keybase.oidc_certificate }}'
-  when: lookup("pipe", "test -d $(dirname %s) && echo YES || echo NO" % satosa_keybase.oidc_certificate) == "YES"
-  shell:
-    creates: '{{ satosa_keybase.oidc_certificate }}'
-    cmd: >-
-      openssl req -x509 -new -key {{ satosa_keybase.oidc_private_key }}
-      -batch -subj '/CN={{ satosa_hostname }}'
-      -days 3650
-      -out {{ satosa_keybase.oidc_certificate }}
-
-
+- include_tasks:
+    file: _self_signed_cert_on_keybase.yml
+    apply:
+      tags:
+        - satosa
+        - satosa.keys
+  tags:
+    - satosa
+    - satosa.keys
+  vars:
+    _key: "{{ item.key }}"
+    _cert: "{{ item.cert }}"
+    _cn: "{{ item.cn }}"
+  with_items:
+  - key: "{{ satosa_keybase.oidc_private_key }}"
+    cert: "{{ satosa_keybase.oidc_certificate }}"
+    cn: "{{ satosa_hostname }}"
 - name: SATOSA Kubernetes objects
   kubernetes.core.k8s:
     definition: '{{ item }}'
