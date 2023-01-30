@@ -1,6 +1,6 @@
 # config/openid_connect_frontend.yaml for SATOSA
 module: satosa.backends.saml2.SAMLBackend
-name: Saml2
+name: "{{ satosa_tequila_saml_entity_name }}"
 config:
   mirror_force_authn: no
   memorize_idp: no
