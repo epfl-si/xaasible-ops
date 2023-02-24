@@ -18,7 +18,6 @@ satosa_keybase:
   saml_private_key: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/satosa-backend.key
   saml_certificate: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/satosa-backend.crt
 
-# TODO: use our own set of SAML identities
 satosa_base_url: "https://{{ satosa_hostname }}"
 satosa_tequila_saml_entity_name: tequila
 satosa_tequila_saml_entity_id: "{{ satosa_base_url }}/{{ satosa_tequila_saml_entity_name }}"
