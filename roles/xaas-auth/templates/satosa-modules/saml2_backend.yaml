@@ -23,6 +23,7 @@ config:
     accepted_time_diff: 60
     service:
       sp:
+        allow_unsolicited: true
         endpoints: 
           assertion_consumer_service:
           - ["{{ satosa_tequila_saml_entity_id }}/acs/post", 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST']
