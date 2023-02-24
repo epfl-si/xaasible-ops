@@ -22,3 +22,10 @@ satosa_base_url: "https://{{ satosa_hostname }}"
 satosa_tequila_saml_entity_name: tequila
 satosa_tequila_saml_entity_id: "{{ satosa_base_url }}/{{ satosa_tequila_saml_entity_name }}"
 satosa_tequila_saml_metadata_url: "https://{{ satosa_tequila_hostname }}/metadata.{{ satosa_tequila_hostname_short }}-IdP-new.xml"
+
+oidc_clients:
+  - client_id: LHDv3
+    redirect_uris:
+    - https://lhdv3.epfl.ch/
+    response_types:
+    - code
