@@ -22,4 +22,4 @@ satosa_keybase:
 satosa_base_url: "https://{{ satosa_hostname }}"
 satosa_tequila_saml_entity_name: tequila
 satosa_tequila_saml_entity_id: "{{ satosa_base_url }}/{{ satosa_tequila_saml_entity_name }}"
-satosa_tequila_saml_metadata_url: "https://{{ satosa_tequila_hostname }}/metadata.{{ satosa_tequila_hostname_short }}-IdP.xml"
+satosa_tequila_saml_metadata_url: "https://{{ satosa_tequila_hostname }}/metadata.{{ satosa_tequila_hostname_short }}-IdP-new.xml"
