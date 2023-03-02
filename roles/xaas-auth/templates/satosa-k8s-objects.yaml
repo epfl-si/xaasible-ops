@@ -75,9 +75,12 @@ spec:
             - name: config
               mountPath: /config
             - name: config
-              mountPath: /usr/local/lib/python3.10/epfl
+              mountPath: /site-python/epfl
             - name: signing-keys
               mountPath: /saml2-backend-secrets
+          env:
+            - name: PYTHONPATH
+              value: /site-python
           ## Uncomment the following lines to get a running (albeit useless) pod for debugging purposes:
 #          command:
 #            - bash
