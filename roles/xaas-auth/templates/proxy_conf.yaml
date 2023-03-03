@@ -5,7 +5,7 @@ COOKIE_STATE_NAME: "SATOSA_STATE"
 cookies_samesite_compat:
   - - SATOSA_STATE
     - SATOSA_STATE_LEGACY
-INTERNAL_ATTRIBUTES: internal_attributes.yaml
+INTERNAL_ATTRIBUTES: /config/internal_attributes.yaml
 COOKIE_STATE_NAME: satosa_state
 STATE_ENCRYPTION_KEY: !ENV STATE_ENCRYPTION_KEY
 BACKEND_MODULES:

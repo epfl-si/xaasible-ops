@@ -121,6 +121,8 @@ data:
     {{ lookup("template", "custom-entrypoint.sh") | indent(4) }}
   satosa_wsgi.py: |
     {{ lookup("template", "satosa_wsgi.py") | indent(4) }}
+  internal_attributes.yaml: |
+    {{ lookup("template", "internal_attributes.yaml") | indent(4) }}
   clients.json: |
     {{ oidc_clients |
        map_dict_defaults({'token_endpoint_auth_method': 'none'}) |
