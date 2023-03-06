@@ -13,7 +13,8 @@ config:
     contact_person:
     - {contact_type: technical, email_address: {{ satosa_tech_support_email }}, given_name: Technical}
     - {contact_type: support, email_address: 1234@epfl.ch, given_name: Support}
-
+    # See the “pysaml2-attribute-maps” ConfigMap object in ../satosa-k8s-objects.yaml for an explanation:
+    attribute_map_dir: /attributemaps
     entityid: "{{ satosa_tequila_saml_entity_id }}"
     metadata:
       remote:

@@ -65,6 +65,21 @@ data:
        to_json | indent(4) }}
 
 ---
+# This ConfigMap provides a suitable configuration directory for
+# PySAML2 to understand Tequila's SAML “attribute statements”.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: attribute-maps-for-pysaml2
+  namespace: {{ satosa_namespace }}
+data:
+  # The contents of this directory should conform to
+  # https://pysaml2.readthedocs.io/en/latest/howto/config.html?highlight=config#attribute-map-dir
+  saml_uri.py: |
+    # This just re-exports the pysaml2 “saml_uri” attribute map, with no changes
+    from saml2.attributemaps.saml_uri import *
+
+---
 apiVersion: v1
 kind: Deployment
 metadata:
@@ -103,6 +118,8 @@ spec:
               mountPath: /config
             - name: config
               mountPath: /site-python/epfl
+            - name: attributemaps
+              mountPath: /attributemaps
             - name: signing-keys
               mountPath: /saml2-backend-secrets
           env:
@@ -125,6 +142,9 @@ spec:
         - name: config
           configMap:
             name: satosa
+        - name: attributemaps
+          configMap:
+            name: attribute-maps-for-pysaml2
         - name: signing-keys
           secret:
             secretName: satosa-saml-signing-keys
