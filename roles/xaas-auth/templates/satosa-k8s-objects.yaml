@@ -75,9 +75,15 @@ metadata:
 data:
   # The contents of this directory should conform to
   # https://pysaml2.readthedocs.io/en/latest/howto/config.html?highlight=config#attribute-map-dir
-  saml_uri.py: |
-    # This just re-exports the pysaml2 “saml_uri” attribute map, with no changes
-    from saml2.attributemaps.saml_uri import *
+  # There is one important detail that that documentation almost
+  # completely glosses over: there can be no two `attribute_maps`
+  # Python definitions with the same `MAP.identifier`, lest one of
+  # them clobber the other! (See e.g.
+  # https://github.com/IdentityPython/pysaml2/blob/master/src/saml2/attribute_converter.py#L138)
+  # This is why `tequila.py` has to “extend” PySAML2's `saml_uri.py` (see
+  # the template of the former for details).
+  tequila.py: |
+    {{ lookup("template", "attributemaps/tequila.py") | indent(4) }}
 
 ---
 apiVersion: v1
