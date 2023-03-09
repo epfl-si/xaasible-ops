@@ -21,3 +21,9 @@
   gather_facts: no
   roles:
     - role: roles/xaas-servicemesh
+
+- name: "xaas-auth: OpenID-Connect Authentication / Authorization service"
+  hosts: all
+  gather_facts: no
+  roles:
+    - role: roles/xaas-auth
