@@ -14,5 +14,8 @@ config:
     extra_scopes:
       tequila:
       - groups
+    extra_id_token_claims:
+      react-starter-kit:
+        - profile
   signing_key_path: /saml2-backend-secrets/oidc.key
   client_db_path: /config/clients.json
