@@ -29,3 +29,9 @@ oidc_clients:
     - https://lhdv3.epfl.ch/
     response_types:
     - code
+
+  - client_id: react-starter-kit
+    redirect_uris:
+    - http://localhost:3000/
+    response_types:
+    - code
