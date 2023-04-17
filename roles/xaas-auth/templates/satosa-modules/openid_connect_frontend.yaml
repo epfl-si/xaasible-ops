@@ -16,6 +16,8 @@ config:
       - groups
     extra_id_token_claims:
       react-starter-kit:
-        - profile
+        - email
+        - given_name
+        - family_name
   signing_key_path: /saml2-backend-secrets/oidc.key
   client_db_path: /config/clients.json
