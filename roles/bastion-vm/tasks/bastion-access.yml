@@ -8,3 +8,12 @@
     dest: "/etc/sudoers.d/{{ ansible_user }}"
     content: |
       {{ ansible_user }} ALL=(ALL) NOPASSWD: ALL
+
+- name: "`{{ ansible_user }}`'s `.ssh/authorized_keys`"
+  ansible.posix.authorized_key:
+    user: "{{ ansible_user }}"
+    comment: "{{ item }}"
+    key: >
+      {{ ssh_public_keys_people[item] | coerce_list | join(" ") }}
+  with_items: >-
+    {{ bastion_ssh_acls[inventory_hostname] }}
