@@ -1,5 +1,0 @@
-xaas_public_vip: 128.178.226.130
-
-# This IP must be the one configured into vsissp-avi-ctrl.epfl.ch, so
-# that traffic from {{ xaas_public_vip }} goes into our nginx:
-nginx_loadbalancer_ip: 10.97.56.112

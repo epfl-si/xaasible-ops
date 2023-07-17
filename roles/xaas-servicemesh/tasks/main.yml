@@ -1,8 +1,0 @@
-- name: Istio
-  include_tasks:
-    file: istio-tasks.yml
-    apply:
-      tags:
-        - istio
-  tags:
-    - istio

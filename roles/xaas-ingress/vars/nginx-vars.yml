@@ -1,3 +1,0 @@
-nginx_helm_chart: ingress-nginx/ingress-nginx
-nginx_ingress_namespace: ingress-nginx
-nginx_ingress_helm_install_name: ingress-nginx
