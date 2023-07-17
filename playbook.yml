@@ -1,1 +1,5 @@
-# This space unintentionally left unblank
+- name: "bastion-vm: configure bastion VM(s)"
+  hosts: bastions
+  gather_facts: no
+  roles:
+    - role: roles/bastion-vm

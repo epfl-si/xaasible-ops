@@ -1,0 +1,10 @@
+- include_vars: "{{ item }}"
+  with_items:
+    - bastion-access-vars.yml
+    - ssh-public-keys.yml
+
+- name: "`{{ ansible_user }}` is password-less sudoer"
+  copy:
+    dest: "/etc/sudoers.d/{{ ansible_user }}"
+    content: |
+      {{ ansible_user }} ALL=(ALL) NOPASSWD: ALL
