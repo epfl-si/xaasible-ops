@@ -1,0 +1,9 @@
+# The so-called “iteration 0” of OpenShift 4 @ EPFL.
+
+bastions:
+  hosts:
+    bastion-ocp-t:
+      ansible_host: bastion-ocp-t.xaas.epfl.ch
+      ansible_user: c2c
+      ansible_become: true
+      inventory_openshift_iteration: 0

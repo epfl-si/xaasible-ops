@@ -32,7 +32,7 @@ ensure_ansible () {
 }
 
 inventories () {
-    echo "-i inventory.yml"
+    echo "-i inventory/openshift-0.yml"
 }
 
 ###########################################################################
