@@ -7,3 +7,7 @@ bastions:
       ansible_user: c2c
       ansible_become: true
       inventory_openshift_iteration: 0
+      # Used in ../roles/bastion-vm/vars/bastion-vsphere-vars.yml, and
+      # also as a key to the top-level dict of
+      # /keybase/team/epfl_idevfsd/OpenShift-4/vsphere-credentials.yml :
+      inventory_vsphere_name: vsphere-test

@@ -1,0 +1,26 @@
+bastion_vsphere_host: >-
+      {{ _bastion_vsphere_credentials[inventory_vsphere_name].host }}
+bastion_vsphere_username: >-
+      {{ _bastion_vsphere_credentials[inventory_vsphere_name].user }}
+bastion_vsphere_password: >-
+      {{ _bastion_vsphere_credentials[inventory_vsphere_name].password }}
+
+_bastion_vsphere_credentials: >-
+  {{ lookup("pipe", "keybase fs read " + _bastion_vsphere_keybase_files[inventory_vsphere_name])
+  | from_yaml }}
+
+_bastion_vsphere_keybase_files:
+  vsphere-test: /keybase/team/epfl_idevfsd/OpenShift-4/vsphere-credentials.yml
+
+bastion_vsphere_vms:
+  bastion-ocp-t:
+    dc: ocp-test-DC
+    subfolder: ocp/management
+    cluster: clstr-test-OCP-01
+    resource_pool: ocp-mgmt
+    datastore: clstr-test-OCP-01_vsanDatastore
+    network:
+        name: S-VLAN-OCP-mgmt-VNI12029
+
+bastion_vsphere_ova_image: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.ova
+bastion_vsphere_ova_image_local_copy: '{{ xaasible_dir }}/xaasible-state-cache/{{ bastion_vsphere_ova_image | basename }}'

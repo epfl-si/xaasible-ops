@@ -1,3 +1,22 @@
+- tags: always
+  include_vars: bastion-vsphere-vars.yml
+
+- include_tasks:
+    file: bastion-vm.yml
+    apply:
+      tags:
+        - bastion
+        - bastion.vm
+      vars:
+        ansible_connection: local
+        ansible_become: false
+        ansible_python_interpreter: "{{ ansible_playbook_python }}"
+      environment:
+        VMWARE_VALIDATE_CERTS: false
+  tags:
+    - bastion
+    - bastion.vm
+
 - include_tasks:
     file: bastion-access.yml
     apply:

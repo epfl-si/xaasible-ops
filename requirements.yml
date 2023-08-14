@@ -1,9 +1,4 @@
 collections:
 - name: kubernetes.core
 - name: ansible.posix
-- # Contains https://github.com/ansible-collections/cloud.common/pull/137
-  type: git
-  name: https://github.com/epfl-si/cloud.common.git
-  version: fix/unclobber-pythonpath
-
 - name: community.vmware

@@ -1,0 +1,30 @@
+- tags: always
+  include_vars: bastion-vsphere-vars.yml
+
+- name: '{{ bastion_vsphere_ova_image_local_copy | dirname }}'
+  delegate_to: localhost
+  file:
+    state: directory
+    path: '{{ bastion_vsphere_ova_image_local_copy | dirname }}'
+
+- name: OVA file on the operator's workstation
+  get_url:
+    url: '{{ bastion_vsphere_ova_image }}'
+    dest: '{{ bastion_vsphere_ova_image_local_copy }}'
+
+- name: Bastion VM
+  community.vmware.vmware_deploy_ovf:
+    hostname: '{{ bastion_vsphere_host }}'
+    username: '{{ bastion_vsphere_username }}'
+    password: '{{ bastion_vsphere_password }}'
+    name: '{{ inventory_hostname }}'
+    datacenter: '{{ _vm_placement.dc }}'
+    folder: '/{{ _vm_placement.dc }}/vm/{{ _vm_placement.subfolder }}'
+    cluster: '{{ _vm_placement.cluster }}'
+    datastore: '{{ _vm_placement.datastore }}'
+    resource_pool: '{{ _vm_placement.resource_pool }}'
+    networks: "{u'VM Network':u'{{ _vm_placement.network.name }}'}"
+    ovf: '{{ bastion_vsphere_ova_image_local_copy }}'
+    power_on: true
+  vars:
+    _vm_placement: '{{ bastion_vsphere_vms[inventory_vsphere_name] }}'
