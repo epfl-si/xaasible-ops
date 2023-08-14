@@ -24,7 +24,6 @@ ensure_ansible () {
             SUITCASE_PIP_EXTRA="bcrypt passlib kubernetes" \
             SUITCASE_ANSIBLE_VERSION=6.3.0 \
             SUITCASE_ANSIBLE_REQUIREMENTS=requirements.yml \
-            SUITCASE_WITH_HELM=1 \
             bash -x
     fi
 
