@@ -11,3 +11,10 @@ bastions:
       # also as a key to the top-level dict of
       # /keybase/team/epfl_idevfsd/OpenShift-4/vsphere-credentials.yml :
       inventory_vsphere_name: vsphere-test
+      inventory_vsphere_credentials_keybase_file: >-
+        /keybase/team/epfl_idevfsd/OpenShift-4/vsphere-credentials-test.yml
+  vars:
+    inventory_vsphere_credentials: >-
+        {{ lookup("pipe", "keybase fs read " +
+                          inventory_vsphere_credentials_keybase_file)
+        | from_yaml }}

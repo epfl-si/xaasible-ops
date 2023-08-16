@@ -14,9 +14,9 @@
 
 - name: Bastion VM
   community.vmware.vmware_deploy_ovf:
-    hostname: '{{ bastion_vsphere_host }}'
-    username: '{{ bastion_vsphere_username }}'
-    password: '{{ bastion_vsphere_password }}'
+    hostname: '{{ inventory_vsphere_credentials.host }}'
+    username: '{{ inventory_vsphere_credentials.user }}'
+    password: '{{ inventory_vsphere_credentials.password }}'
     name: '{{ inventory_hostname }}'
     datacenter: '{{ _vm_placement.dc }}'
     folder: '/{{ _vm_placement.dc }}/vm/{{ _vm_placement.subfolder }}'
