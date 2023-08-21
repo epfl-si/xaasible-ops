@@ -1,2 +1,3 @@
 bootstrap_topdir: "/root/xaasible-{{ inventory_hostname }}"
+bootstrap_ocp_config_dir: "{{ bootstrap_topdir }}/ocp-setup"
 bootstrap_pull_secret_file: "{{ xaasible_cache_dir }}/pull-secret.json"

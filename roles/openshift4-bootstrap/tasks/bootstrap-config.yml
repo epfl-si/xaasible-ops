@@ -10,6 +10,7 @@
     path: "{{ item }}"
   with_items:
     - "{{ bootstrap_topdir }}"
+    - "{{ bootstrap_ocp_config_dir }}"
 
 - name: "{{ bootstrap_topdir }}/install-config.yaml"
   copy:
@@ -23,3 +24,11 @@
       | trim
       | string
       }}
+
+- name: "Create manifests under {{ bootstrap_ocp_config_dir }}/manifests"
+  shell:
+    creates: "{{ bootstrap_ocp_config_dir }}/manifests"
+    cmd: |
+      set -e -x
+      cp {{ bootstrap_topdir }}/install-config.yaml {{ bootstrap_ocp_config_dir }}/
+      openshift-install create manifests --dir {{ bootstrap_ocp_config_dir }}
