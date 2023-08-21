@@ -14,3 +14,9 @@
     cmd: >-
       curl -s {{ openshift_install_download_url }}
       | tar -C/usr/local/bin -zxvf - openshift-install
+
+- name: "/root/oh"
+  # So that when you type `ls`, you see oh  snap
+  file:
+    path: /root/oh
+    state: directory
