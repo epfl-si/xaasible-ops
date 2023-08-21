@@ -3,6 +3,7 @@
   with_items:
     - bastion-access-vars.yml
     - ssh-public-keys.yml
+    - resources.yml
     - bastion-vsphere-vars.yml
 
 - name: '{{ bastion_vsphere_ova_image_local_copy | dirname }}'

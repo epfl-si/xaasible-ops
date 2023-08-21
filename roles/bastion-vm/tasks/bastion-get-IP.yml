@@ -1,4 +1,7 @@
-- include_vars: bastion-vsphere-vars.yml
+- include_vars: "{{ item }}"
+  with_items:
+    - resources.yml
+    - bastion-vsphere-vars.yml
 
 - name: "Enumerate VMs in {{ bastion_vm_placement_folder_full }}"
   community.vmware.vmware_vm_info:

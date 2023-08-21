@@ -1,0 +1,33 @@
+# In this file (and only this file), decisions are made on how to
+# allocate the various resources that the OpenShift clusters and their
+# associated moving parts (i.e. bastion VMs) will consume.
+#
+# Resources currently include:
+#
+# - VMware objects, such as dcs, folders, compute resource pools,
+#   datastores and networks
+#
+# - IPv4 ranges, both “EPFL-public” (in the 10.*.*.* range) and
+#   private (e.g. for Kubernetes pods and services).
+
+resources_bastion_vms:
+  bastion-ocp-t:
+    vsphere_placement: "{{ _vsphere_placements.test.mgmt }}"
+
+_vsphere_placements:
+  test:
+    mgmt:
+      dc: ocp-test-DC
+      subfolder: ocp/management
+      cluster: clstr-test-OCP-01
+      resource_pool: ocp-mgmt
+      datastore: clstr-test-OCP-01_vsanDatastore
+      network: "{{ _vsphere_networks.test.mgmt }}"
+
+_vsphere_networks:
+  test:
+    mgmt:
+      name: S-VLAN-OCP-mgmt-VNI12029
+      # ipv4:
+      #  cidr: 10.98.24.0/24
+      #  gateway: 10.98.24.1
