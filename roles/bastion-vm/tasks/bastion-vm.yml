@@ -16,7 +16,13 @@
     url: '{{ bastion_vsphere_ova_image }}'
     dest: '{{ bastion_vsphere_ova_image_local_copy }}'
 
-- name: Bastion VM
+- name: Bastion VM (💡 Expect warning on vSphere 7.0.3)
+  # our version of vCenter (7.0.3) doesn't know about the
+  # `enableMPTSupport` `vmw:Config` option, which the latest Ubuntu
+  # Jenny image uses; and that causes a server-side parse warning.
+  # Fixing that correctly would be pretty onerous, as it requires
+  # patching the OVA image on the operator's workstation (in turn
+  # requiring more tools, storage and compute).
   community.vmware.vmware_deploy_ovf:
     name: '{{ inventory_hostname }}'
     hostname: '{{ inventory_vsphere_credentials.host }}'
