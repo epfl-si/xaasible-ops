@@ -1,0 +1,11 @@
+- tags: always
+  include_vars: "{{ item }}"
+  with_items:
+    - resources.yml
+    - bootstrap-vars.yml
+
+- name: Install the {{ inventory_hostname }} cluster
+  shell:
+    creates: "{{ bootstrap_ocp_config_dir }}/auth/kubeadmin-password"
+    cmd: |
+      openshift-install create cluster --dir {{ bootstrap_ocp_config_dir }}

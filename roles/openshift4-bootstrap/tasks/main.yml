@@ -42,3 +42,15 @@
     - openshift
     - openshift.bootstrap
     - openshift.bootstrap.config
+
+- include_tasks:
+    file: bootstrap-install.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.bootstrap
+        - openshift.bootstrap.install
+  tags:
+    - openshift
+    - openshift.bootstrap
+    - openshift.bootstrap.install
