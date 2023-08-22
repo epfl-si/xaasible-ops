@@ -45,3 +45,13 @@
     - bastion
     - bastion.ca
     - bastion.CA
+
+- include_tasks:
+    file: bastion-motd.yml
+    apply:
+      tags:
+        - bastion
+        - bastion.motd
+  tags:
+    - bastion
+    - bastion.motd

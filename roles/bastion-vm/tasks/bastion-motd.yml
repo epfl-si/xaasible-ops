@@ -1,0 +1,50 @@
+# Manage Message of the Day (motd) that appears upon ssh'ing to the
+# bastion VM
+
+# 💡 A roadmap to disabling Ubuntu spam is to be found at
+# https://github.com/Skyedra/UnspamifyUbuntu
+
+- name: Disable motd news
+  register: _motd_news
+  lineinfile:
+    path: /etc/default/motd-news
+    regexp: ^ENABLED=
+    line: ENABLED=0
+
+- name: Disable motd help text
+  file:
+    path: "/etc/update-motd.d/10-help-text"
+    mode: "a-x"
+
+- name: Disable apt-check spam
+  # Pretty much “your car's extended warranty”-level stuff here...
+  blockinfile:
+    path:  /usr/lib/update-notifier/apt_check.py
+    insertafter: "write out human summary"
+    block: |
+      #
+          have_esm_infra = None
+          have_esm_apps = None
+  register: _apt_check
+
+- when: _apt_check is changed
+  name: Run `/usr/lib/update-notifier/update-motd-updates-available`
+  shell:
+    cmd: /usr/lib/update-notifier/update-motd-updates-available --force
+
+- name: /etc/motd
+  copy:
+    dest: /etc/motd
+    content: >-
+      {{ _content | replace('%', '') }}
+  vars:
+    _content: |
+      %
+      *****
+      *****     {{ inventory_hostname }}
+      *****
+      ***** Auto-provisioned bastion VM for OpenShift 4 installs
+      *****
+      %
+      %
+      %
