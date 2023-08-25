@@ -1,0 +1,73 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")"; cd "$(/bin/pwd)"
+. "$PWD"/ansible-deps-cache/lib.sh
+
+usage () {
+    fatal <<'USAGE'
+
+xaasctl - Manage OpenShift clusters that xaasible creates
+
+Usage:
+
+   xaasctl list-clusters [ -v ]
+
+USAGE
+}
+
+main () {
+    source_inventories
+
+    case "$1" in
+        list|list-clusters)
+            shift
+            list_clusters "$@"
+            ;;
+        *)
+            usage ;;
+    esac
+}
+
+source_inventories () {
+    local inventory=xaasible-state-cache/xaasctl-inventory.sh
+
+    if [ -f "$inventory" ]; then
+        . "$inventory"
+    else
+        fatal <<PLEASE_RUN_XAASIBLE_FIRST
+
+Fatal: the file $inventory doesn't exist.
+
+Please run xaasible first in order to create it.
+
+PLEASE_RUN_XAASIBLE_FIRST
+    fi
+}
+
+list_clusters () {
+    case "$1" in
+        "")
+            clusters | cut -d' ' -f2 ;;
+        --undocumented-debug)
+            clusters ;;
+        -v|--verbose)
+            clusters | while read name fqdn bastion_name; do
+                echo $fqdn
+                echo -n "    bastion:    "; eval "bastion_${bastion_name}_inventory_name"
+                echo -n "    bastion IP: "; eval "bastion_ipv4_${bastion_name}"
+            done ;;
+        *) usage ;;
+    esac
+}
+
+clusters () {
+    set | sed -n -e 's/^cluster_\([^=]*\)_fqdn=\(.*\)/\1 \2/p' | while read cluster_name fqdn; do
+        echo "$cluster_name $fqdn $(eval "cluster_${cluster_name}_bastion_name")"
+    done
+}
+
+####################################################################
+
+main "$@"

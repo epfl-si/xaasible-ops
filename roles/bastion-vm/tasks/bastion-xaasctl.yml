@@ -1,0 +1,23 @@
+- shell:
+    creates: "{{ xaasible_cache_dir }}/xaasctl-inventory.sh"
+    cmd: |
+      mkdir -p {{ xaasible_cache_dir }} || true
+      touch {{ xaasible_cache_dir }}/xaasctl-inventory.sh
+
+- name: Update xaasctl-inventory.sh with findings from this role
+  blockinfile:
+    path:  "{{ xaasible_cache_dir }}/xaasctl-inventory.sh"
+    marker: "# {mark} {{ inventory_hostname }} declarations from bastion-xaasctl.yml"
+    block: |
+      {% for _inventory_name in groups['bastions'] %}
+      {%   set _bastion_name = _inventory_name | regex_replace('-', '_') %}
+      {%   set _hostvars = hostvars[_inventory_name] %}
+
+      bastion_{{ _bastion_name }}_inventory_name () {
+        echo "{{ _inventory_name }}"
+      }
+
+      bastion_ipv4_{{ _bastion_name }} () {
+        echo {{ _hostvars.ansible_host }}
+      }
+      {% endfor %}

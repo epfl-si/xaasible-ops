@@ -1,0 +1,25 @@
+- shell:
+    creates: "{{ xaasible_cache_dir }}/xaasctl-inventory.sh"
+    cmd: |
+      mkdir -p {{ xaasible_cache_dir }} || true
+      touch {{ xaasible_cache_dir }}/xaasctl-inventory.sh
+
+- name: Update xaasible-state-cache/xaasctl-inventory.sh with findings from this role
+  blockinfile:
+    path:  "{{ xaasible_cache_dir }}/xaasctl-inventory.sh"
+    marker: "# {mark} {{ inventory_hostname }} declarations from bootstrap-xaasctl.yml"
+    block: |
+      {% for _cluster_name in groups['openshift_hub_clusters'] %}
+      {%   set _cluster_vars = hostvars[_cluster_name] %}
+      {%   set _cluster_name_shell = _cluster_name | regex_replace('[-.]', '_') %}
+
+      cluster_{{ _cluster_name_shell }}_fqdn={{ _cluster_name }}
+
+      cluster_{{ _cluster_name_shell }}_bastion_name () {
+        echo {{ _cluster_vars.inventory_bastion | regex_replace('-', '_') }}
+      }
+
+      cluster_{{ _cluster_name_shell }}_bastion_homedir () {
+        echo {{ _cluster_vars.bootstrap_topdir }}
+      }
+      {% endfor %}

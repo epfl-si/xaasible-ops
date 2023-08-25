@@ -55,3 +55,17 @@
   tags:
     - bastion
     - bastion.motd
+
+- include_tasks:
+    file: bastion-xaasctl.yml
+    apply:
+      tags:
+        - bastion
+        - bastion.xaasctl
+      delegate_to: localhost
+      vars:
+        ansible_connection: local  # So that Ansible won't attempt to ssh
+                                   # to localhost 🤦
+  tags:
+    - bastion
+    - bastion.xaasctl

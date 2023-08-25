@@ -54,3 +54,16 @@
     - openshift
     - openshift.bootstrap
     - openshift.bootstrap.install
+
+- include_tasks:
+    file: bootstrap-xaasctl.yml
+    apply:
+      tags:
+        - openshift.bootstrap
+        - openshift.bootstrap.xaasctl
+      delegate_to: localhost
+      vars:
+        ansible_connection: local
+  tags:
+    - openshift.bootstrap
+    - openshift.bootstrap.xaasctl
