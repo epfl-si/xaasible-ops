@@ -1,4 +1,4 @@
-bastion_ssh_acls:
+ssh_acls:
   bastion-ocp-t:
     - diego.abelenda@camptocamp.com
     - julien.godin@camptocamp.com

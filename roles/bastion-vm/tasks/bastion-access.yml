@@ -1,6 +1,6 @@
 - include_vars: "{{ item }}"
   with_items:
-    - bastion-access-vars.yml
+    - access.yml
     - ssh-public-keys.yml
 
 - name: "`{{ ansible_user }}` is password-less sudoer"
@@ -16,4 +16,4 @@
     key: >
       {{ ssh_public_keys_people[item] | coerce_list | join(" ") }}
   with_items: >-
-    {{ bastion_ssh_acls[inventory_hostname] }}
+    {{ ssh_acls[inventory_hostname] }}

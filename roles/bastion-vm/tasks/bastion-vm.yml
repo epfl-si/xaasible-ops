@@ -1,7 +1,7 @@
 - tags: always
   include_vars: "{{ item }}"
   with_items:
-    - bastion-access-vars.yml
+    - access.yml
     - ssh-public-keys.yml
     - resources.yml
     - bastion-vsphere-vars.yml
@@ -43,7 +43,7 @@
                           # me how I know
     properties:
       public-keys: |
-        {% for authorized in bastion_ssh_acls[inventory_hostname] %}
+        {% for authorized in ssh_acls[inventory_hostname] %}
         {%   for key in ssh_public_keys_people[authorized] | coerce_list %}
         {{ key }} {{ authorized }}
         {%   endfor %}
