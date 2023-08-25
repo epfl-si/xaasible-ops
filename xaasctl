@@ -76,6 +76,7 @@ list_clusters () {
 
 log_in_to_cluster () {
     local fqdn=$1; shift
+    cluster_of_fqdn "$fqdn" >/dev/null  # Checks existence
     local cluster="$(cluster_of_fqdn "$fqdn")"
     local token=$(ssh_bastion_in_cluster_dir "$fqdn" 'curl -v -k --user kubeadmin:$(cat auth/kubeadmin-password) --header "X-CSRF-Token: 1" --url '"$(cluster_openshift_basicauth_endpoint "$fqdn" | sed 's/&/\\&/')"' 2>&1 | grep -o "access_token=[^\&]*" |cut -d= -f2')
     local server="$(cluster_k8s_api_endpoint "$fqdn")"
@@ -85,7 +86,9 @@ log_in_to_cluster () {
 
 destroy_cluster () {
     local fqdn=$1; shift
+    bastion_of_fqdn "$fqdn" >/dev/null  # Checks existence
     local bastion="$(bastion_of_fqdn "$fqdn")"
+    cluster_of_fqdn "$fqdn" >/dev/null  # Checks existence
     local cluster="$(cluster_of_fqdn "$fqdn")"
     cat >&2 <<WHOA
 
@@ -109,20 +112,28 @@ clusters () {
 
 bastion_of_fqdn () {
     local fqdn=$1; shift
-    clusters | while read _cluster_name _fqdn _response; do
-        if [ "$fqdn" = "$_fqdn" ]; then
-            echo "$_response"
-        fi
-    done
+    clusters | {
+        while read _cluster_name _fqdn _response; do
+            if [ "$fqdn" = "$_fqdn" ]; then
+                echo "$_response"
+                exit 0
+            fi
+        done
+        fatal "Unknown FQDN: $fqdn - try: $0 list-clusters"
+    }
 }
 
 cluster_of_fqdn () {
     local fqdn=$1; shift
-    clusters | while read _cluster_name _fqdn _response; do
-        if [ "$fqdn" = "$_fqdn" ]; then
-            echo "$_cluster_name"
-        fi
-    done
+    clusters | {
+        while read _cluster_name _fqdn _response; do
+            if [ "$fqdn" = "$_fqdn" ]; then
+                echo "$_cluster_name"
+                return 0
+            fi
+        done
+        fatal "Unknown FQDN: $fqdn - try: $0 list-clusters"
+    }
 }
 
 ssh_bastion () {
@@ -132,7 +143,9 @@ ssh_bastion () {
 
 ssh_bastion_in_cluster_dir () {
     local fqdn=$1; shift
+    cluster_of_fqdn "$fqdn" >/dev/null  # Checks existence
     local cluster="$(cluster_of_fqdn "$fqdn")"
+    bastion_of_fqdn "$fqdn" >/dev/null  # Checks existence
     local bastion="$(bastion_of_fqdn "$fqdn")"
     ssh_bastion "$bastion" "cd $(eval cluster_${cluster}_ocp_config_dir) && $*"
 }
