@@ -4,8 +4,32 @@
     - resources.yml
     - bootstrap-vars.yml
 
-- name: Install the {{ inventory_hostname }} cluster
+- name: Check whether `openshift-install` already ran
+  stat:
+    path: "{{ bootstrap_ocp_config_dir }}/auth/kubeadmin-password"
+  register: _openshift_kubeadmin_password
+
+- when: not _openshift_kubeadmin_password.stat.exists
+  pause:
+    echo: false
+    seconds: 1
+    prompt: |
+      ==========================================================================
+
+      OpenShift installation is in progress; this might take some time.
+
+      Feel free to run
+
+          ssh root@{{ ansible_host }} tail -f {{ bootstrap_ocp_config_dir }}/.openshift_install.log
+
+      if you are bored.
+
+      ==========================================================================
+
+- name: Bootstrap the cluster
+  when: not _openshift_kubeadmin_password.stat.exists
   shell:
-    creates: "{{ bootstrap_ocp_config_dir }}/auth/kubeadmin-password"
     cmd: |
-      openshift-install create cluster --dir {{ bootstrap_ocp_config_dir }}
+      tmux new-session -d -s openshift-install \
+        'openshift-install create cluster --dir {{ bootstrap_ocp_config_dir }} ; tmux wait -S {{ cluster_name }}'
+      tmux wait {{ cluster_name }}
