@@ -1,5 +1,5 @@
 bastion_vsphere_ova_image: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.ova
-bastion_vsphere_ova_image_local_copy: '{{ xaasible_dir }}/xaasible-state-cache/{{ bastion_vsphere_ova_image | basename }}'
+bastion_vsphere_ova_image_local_copy: '{{ xaasible_cache_dir }}/{{ bastion_vsphere_ova_image | basename }}'
 
 # Requires ../../../vars/resources.yml:
 bastion_vm_placement: "{{ resources_bastion_vms[inventory_hostname].vsphere_placement }}"
