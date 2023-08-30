@@ -33,3 +33,15 @@
   tags:
     - bastion
     - bastion.software
+
+- include_tasks:
+    file: bastion-vsphere-CA.yml
+    apply:
+      tags:
+        - bastion
+        - bastion.ca
+        - bastion.CA
+  tags:
+    - bastion
+    - bastion.ca
+    - bastion.CA

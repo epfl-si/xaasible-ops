@@ -1,0 +1,32 @@
+# Ensure that the bastion VM's CA store is set up to trust the vSphere
+# API endpoint
+#
+# Instructions from
+# https://docs.openshift.com/container-platform/4.13/installing/installing_vsphere/installing-vsphere-installer-provisioned.html#installation-adding-vcenter-root-certificates_installing-vsphere-installer-provisioned
+# and
+# https://askubuntu.com/questions/73287/how-do-i-install-a-root-certificate
+
+- name: vSphere CA directory
+  file:
+    path: /usr/local/share/ca-certificates/vsphere
+    state: directory
+
+- name: vSphere CA bundle
+  copy:
+    dest: "/usr/local/share/ca-certificates/vsphere/{{ inventory_vsphere_credentials.host }}-bundle.crt"
+    content: >-
+      {{ lookup("vsphere_ca_bundle", "https://{{ inventory_vsphere_credentials.host }}/certs/download.zip") }}
+
+- name: Import vSphere CA certificates into bastion's system trust root
+  shell:
+    cmd: |
+      update-ca-certificates
+  register: _update_ca_certificates
+  changed_when: >-
+    "0 added, 0 removed" not in _update_ca_certificates.stdout
+
+- name: Check that {{ inventory_hostname }} trusts https://{{ inventory_vsphere_credentials.host }}/
+  changed_when: false
+  shell:
+    cmd: |
+      curl https://{{ inventory_vsphere_credentials.host }}/
