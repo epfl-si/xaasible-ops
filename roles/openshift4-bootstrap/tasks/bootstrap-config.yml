@@ -3,6 +3,8 @@
   with_items:
     - resources.yml
     - bootstrap-vars.yml
+    - access.yml
+    - ssh-public-keys.yml
 
 - name: Work directories for openshift-installer
   file:
