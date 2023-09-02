@@ -15,7 +15,7 @@
 # - https://www.ansible.com/overview/how-ansible-works
 # - https://github.com/jdauphant/awesome-ansible
 
-cd "$(dirname "$0")"; cd "$(/bin/pwd)"
+cd "$(cd $(dirname "$0"); /bin/pwd)"
 
 ensure_ansible () {
     if ! test -f ansible-deps-cache/.versions 2>/dev/null; then
