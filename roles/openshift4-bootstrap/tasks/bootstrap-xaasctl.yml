@@ -1,8 +1,22 @@
+- tags: always
+  include_vars: bootstrap-vars.yml
+
 - shell:
     creates: "{{ xaasible_cache_dir }}/xaasctl-inventory.sh"
     cmd: |
       mkdir -p {{ xaasible_cache_dir }} || true
       touch {{ xaasible_cache_dir }}/xaasctl-inventory.sh
+
+- name: "{{ cluster_local_ca_bundle_file }}"
+  copy:
+    dest: "{{ cluster_local_ca_bundle_file }}"
+    content: >-
+      {{ lookup("pipe",
+      "ssh -o strictHostKeyChecking=no root@{{ ansible_host }}
+      yq .clusters.0.cluster.certificate-authority-data
+      {{ bootstrap_ocp_config_dir }}/auth/kubeconfig
+      | base64 -d"
+      ) }}
 
 - name: Update xaasible-state-cache/xaasctl-inventory.sh with findings from this role
   blockinfile:
@@ -21,5 +35,13 @@
 
       cluster_{{ _cluster_name_shell }}_bastion_homedir () {
         echo {{ _cluster_vars.bootstrap_topdir }}
+      }
+
+      cluster_{{ _cluster_name_shell }}_ocp_config_dir () {
+        echo {{ _cluster_vars.bootstrap_ocp_config_dir }}
+      }
+
+      cluster_{{ _cluster_name_shell }}_ca_bundle () {
+        echo "{{ _cluster_vars.cluster_local_ca_bundle_file }}"
       }
       {% endfor %}

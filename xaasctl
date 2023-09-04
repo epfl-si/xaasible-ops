@@ -13,6 +13,7 @@ xaasctl - Manage OpenShift clusters that xaasible creates
 Usage:
 
    xaasctl list-clusters [ -v ]
+   xaasctl login-cluster DOMAINNAME
 
 USAGE
 }
@@ -24,6 +25,11 @@ main () {
         list|list-clusters)
             shift
             list_clusters "$@"
+            ;;
+        login|login-cluster)
+            shift
+            [ $# -gt 0 ] || usage
+            log_in_to_cluster "$@"
             ;;
         *)
             usage ;;
@@ -62,10 +68,63 @@ list_clusters () {
     esac
 }
 
+log_in_to_cluster () {
+    local fqdn=$1; shift
+    local cluster="$(cluster_of_fqdn "$fqdn")"
+    local token=$(ssh_bastion_in_cluster_dir "$fqdn" 'curl -v -k --user kubeadmin:$(cat auth/kubeadmin-password) --header "X-CSRF-Token: 1" --url '"$(cluster_openshift_basicauth_endpoint "$fqdn" | sed 's/&/\\&/')"' 2>&1 | grep -o "access_token=[^\&]*" |cut -d= -f2')
+    local server="$(cluster_k8s_api_endpoint "$fqdn")"
+    local ca_bundle="$(eval "cluster_${cluster}_ca_bundle")"
+    oc login --certificate-authority="$ca_bundle" --token="$token" --server="$server"
+}
+
 clusters () {
     set | sed -n -e 's/^cluster_\([^=]*\)_fqdn=\(.*\)/\1 \2/p' | while read cluster_name fqdn; do
         echo "$cluster_name $fqdn $(eval "cluster_${cluster_name}_bastion_name")"
     done
+}
+
+bastion_of_fqdn () {
+    local fqdn=$1; shift
+    clusters | while read _cluster_name _fqdn _response; do
+        if [ "$fqdn" = "$_fqdn" ]; then
+            echo "$_response"
+        fi
+    done
+}
+
+cluster_of_fqdn () {
+    local fqdn=$1; shift
+    clusters | while read _cluster_name _fqdn _response; do
+        if [ "$fqdn" = "$_fqdn" ]; then
+            echo "$_cluster_name"
+        fi
+    done
+}
+
+ssh_bastion () {
+    local bastion_name=$1; shift
+    ssh -o strictHostKeyChecking=no root@"$(eval "bastion_ipv4_${bastion_name}")" "$@"
+}
+
+ssh_bastion_in_cluster_dir () {
+    local fqdn=$1; shift
+    local cluster="$(cluster_of_fqdn "$fqdn")"
+    local bastion="$(bastion_of_fqdn "$fqdn")"
+    ssh_bastion "$bastion" "cd $(eval cluster_${cluster}_ocp_config_dir) && $*"
+}
+
+cluster_ingress_domain () {
+    local fqdn=$1; shift
+    echo "apps.$fqdn"
+}
+
+cluster_openshift_basicauth_endpoint () {
+    local fqdn=$1; shift
+    echo "https://oauth-openshift.$(cluster_ingress_domain "$fqdn")/oauth/authorize?response_type=token&client_id=openshift-challenging-client"
+}
+
+cluster_k8s_api_endpoint () {
+    echo "https://api.${fqdn}:6443"
 }
 
 ####################################################################

@@ -10,3 +10,5 @@ cluster_base_domain: >-
   inventory_hostname
   | regex_replace('^[^.]+[.]', '')
   }}
+cluster_local_ca_bundle_file: >-
+  {{ xaasible_cache_dir }}/{{ inventory_hostname }}-bundle.crt
