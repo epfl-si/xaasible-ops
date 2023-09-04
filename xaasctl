@@ -14,6 +14,7 @@ Usage:
 
    xaasctl list-clusters [ -v ]
    xaasctl login-cluster DOMAINNAME
+   xaasctl destroy-cluster DOMAINNAME
 
 USAGE
 }
@@ -30,6 +31,11 @@ main () {
             shift
             [ $# -gt 0 ] || usage
             log_in_to_cluster "$@"
+            ;;
+        destroy|destroy-cluster)
+            shift
+            [ $# -gt 0 ] || usage
+            destroy_cluster "$@"
             ;;
         *)
             usage ;;
@@ -77,6 +83,24 @@ log_in_to_cluster () {
     oc login --certificate-authority="$ca_bundle" --token="$token" --server="$server"
 }
 
+destroy_cluster () {
+    local fqdn=$1; shift
+    local bastion="$(bastion_of_fqdn "$fqdn")"
+    local cluster="$(cluster_of_fqdn "$fqdn")"
+    cat >&2 <<WHOA
+
+Whoa.
+
+Would you be so kind as to copy and paste the following commands in your shell:
+
+   ssh root@$(eval "bastion_ipv4_${bastion}") openshift-install destroy cluster --dir $(eval "cluster_${cluster}_ocp_config_dir")
+   ssh root@$(eval "bastion_ipv4_${bastion}") rm -rf $(dirname $(eval "cluster_${cluster}_ocp_config_dir"))
+
+
+... cause I sure ain't doing that for you.
+
+WHOA
+}
 clusters () {
     set | sed -n -e 's/^cluster_\([^=]*\)_fqdn=\(.*\)/\1 \2/p' | while read cluster_name fqdn; do
         echo "$cluster_name $fqdn $(eval "cluster_${cluster_name}_bastion_name")"
