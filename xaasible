@@ -31,6 +31,21 @@ ensure_ansible () {
     ensure_ansible_runtime
 }
 
+ensure_oc () {
+    oc --help > /dev/null || fatal <<'PLEASE_INSTALL_OC'
+
+The `oc` command line tool is required. Bailing out.
+
+Please install the `oc` command-line tool on your system, and try
+again.
+
+Installation instructions can be found at
+https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html
+
+
+PLEASE_INSTALL_OC
+}
+
 inventories () {
     echo "-i inventory/openshift-0.yml"
 }
@@ -40,6 +55,7 @@ inventories () {
 set -e
 
 ensure_ansible
+ensure_oc
 playbook_flags="$(ansible_flag_set_var_homedir xaasible_dir)"
 
 mode=ansible-playbook
