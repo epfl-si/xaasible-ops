@@ -67,3 +67,13 @@
   tags:
     - openshift.bootstrap
     - openshift.bootstrap.xaasctl
+
+- tags: always
+  name: Log in to bootstrapped cluster (through bastion)
+  changed_when: false  # Eh. It only changes a cache.
+  shell:
+    cmd: |
+      env KUBECONFIG={{ xaasible_kubeconfig }} ./xaasctl login-cluster {{ inventory_hostname }}
+  vars:
+    ansible_connection: local
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
