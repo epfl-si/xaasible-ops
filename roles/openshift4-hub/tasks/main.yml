@@ -1,0 +1,18 @@
+- tags: always
+  include_vars: xaasible-vars.yml
+
+- name: Install multicluster operator
+  include_tasks:
+    file: hub-operator.yml
+    apply:
+      environment:
+        # Applies both to `kubernetes.core.k8s:` and `shell:` tasks:
+        KUBECONFIG: "{{ xaasible_kubeconfig }}"
+      tags:
+        - openshift
+        - openshift.hub
+        - openshift.hub.operator
+  tags:
+    - openshift
+    - openshift.hub
+    - openshift.hub.operator

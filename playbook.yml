@@ -21,3 +21,14 @@
         ansible_user: root        # As in roles/bastion-vm, above
         ansible_connection: ssh   # Ditto
         vsphere_credentials: "{{ hostvars[inventory_bastion].inventory_vsphere_credentials }}"
+
+- name: "openshift4-hub: for clusters that can create clusters"
+  hosts: openshift_hub_clusters
+  gather_facts: no
+  roles:
+    - role: roles/openshift4-hub
+      vars:
+        # Now that boostrap is over, we no longer want to go through
+        # the bastion to talk to clusters:
+        ansible_connection: local
+        ansible_python_interpreter: "{{ xaasible_python_shim }}"
