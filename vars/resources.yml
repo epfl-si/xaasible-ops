@@ -30,7 +30,7 @@ resources_openshift_clusters:
       # The DHCP range is only from 10.98.24.190 to 10.98.24.254.
       cidr: 10.98.24.0/24
     podIPs:
-      cidr: 10.128.0.0/14
+      cidr: 192.168.0.0/16
       hostPrefix: 23
     serviceIPs:
       cidr: 172.30.0.0/16
