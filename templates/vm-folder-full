@@ -1,0 +1,6 @@
+{# Compute the fully qualified folder name for VMs
+ #
+ # Caller must set `_vm_placement` to a dict with `dc` and `subfolder` entries,
+ # for instance from one of the data structures found in ../vars/resources.yml
+ #}
+/{{ _vm_placement.dc }}/vm/{{ _vm_placement.subfolder }}
