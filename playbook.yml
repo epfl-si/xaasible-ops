@@ -38,3 +38,20 @@
         # the bastion to talk to clusters:
         ansible_connection: local
         ansible_python_interpreter: "{{ xaasible_python_shim }}"
+
+- name: "openshift4-spoke: spin up managed clusters"
+  hosts: openshift_spoke_clusters
+  gather_facts: no
+  roles:
+    - role: roles/openshift4-spoke
+      vars:
+        ansible_connection: local
+        ansible_python_interpreter: "{{ xaasible_python_shim }}"
+        # TODO: this assumes that all hubs have a bastion (and is
+        # quite clunky to boot). Refactor
+        vsphere_credentials: >-
+          {{ hostvars[_bastion_inventory_name].inventory_vsphere_credentials }}
+        _bastion_inventory_name: >-
+            {{ hostvars[_hub_cluster_inventory_name].inventory_bastion }}
+        _hub_cluster_inventory_name: >-
+          {{ hostvars[inventory_hostname].inventory_hub_cluster }}

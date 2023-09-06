@@ -1,0 +1,16 @@
+- name: Install spoke cluster
+  include_tasks:
+    file: spoke-install.yml
+    apply:
+      environment:
+        # During install only, talk to the parent (hub) cluster:
+        KUBECONFIG: >-
+          {{ hostvars[inventory_hub_cluster].xaasible_kubeconfig }}
+      tags:
+        - openshift
+        - openshift.spoke
+        - openshift.spoke.install
+  tags:
+    - openshift
+    - openshift.spoke
+    - openshift.spoke.install

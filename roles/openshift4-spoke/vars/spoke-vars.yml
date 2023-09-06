@@ -1,0 +1,2 @@
+spoke_namespace_in_hub: >-
+  managed-cluster-{{ inventory_hostname | regex_replace("\..*$", "") }}

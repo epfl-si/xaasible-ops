@@ -1,0 +1,128 @@
+- tags: always
+  include_vars: "{{ item }}"
+  with_items:
+    - versions.yml
+    - resources.yml
+    - spoke-vars.yml
+
+- name: Namespace for the managed cluster
+  kubernetes.core.k8s:
+    definition:
+      kind: Namespace
+      metadata:
+        name: "{{ spoke_namespace_in_hub }}"
+
+- name: Pull secret for spoke (same as hub)
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: kubernetes.io/dockerconfigjson
+      metadata:
+        name: spoke-pull-secret
+        namespace: "{{ spoke_namespace_in_hub }}"
+      stringData:
+        .dockerconfigjson: "{{ xaasible_pull_secret }}"
+
+# The following two objects are marked as required in `oc explain
+# ClusterDeployment.spec.platform.vsphere`, but the details there are
+# hazy or wrong. To find what these should look like, we had to take a
+# look at what the clicky thing in the dashboard creates.
+- name: vCenter CA certificate (Secret)
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      metadata:
+        name: vcenter-cert-bundle
+        namespace: "{{ spoke_namespace_in_hub }}"
+      kind: Secret
+      type: Opaque
+      stringData:
+        ca.crt: >-
+          {{ lookup("vsphere_ca_bundle",
+          "https://" + vsphere_credentials.host + "/certs/download.zip"
+          ) }}
+
+- name: vCenter credentials
+  kubernetes.core.k8s:
+    definition:
+      kind: Secret
+      metadata:
+          name: spoke-vsphere-credentials
+          namespace: "{{ spoke_namespace_in_hub }}"
+      type: Opaque
+      stringData:
+        username: "{{ vsphere_credentials.user }}"
+        password: "{{ vsphere_credentials.password }}"
+
+- tags: always
+  include_vars: "{{ item }}"
+  with_items:
+    # The `ocp-install-config.yaml` template in the next task below
+    # wants these, so as to set up ssh access to managed nodes (and
+    # also, https://github.com/ansible/ansible/issues/57751 forces us
+    # to do things this way):
+    - ssh-public-keys.yml
+    - access.yml
+
+- name: openshift-install-config secret
+  kubernetes.core.k8s:
+    definition:
+      kind: Secret
+      metadata:
+        name: openshift-install-config
+        namespace: "{{ spoke_namespace_in_hub }}"
+      stringData:
+        "install-config.yaml": >-
+          {{ lookup("template", "ocp-install-config.yaml") }}
+  vars:
+    # The template explicitly expects the following variables:
+    ocp_config_pull_secret: "{{ xaasible_pull_secret }}"
+    ocp_config_resources: >-
+      {{ resources_openshift_clusters[inventory_hostname] }}
+    ocp_config_is_for_hive: true
+
+- name: ClusterDeployment object
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: hive.openshift.io/v1
+      kind: ClusterDeployment
+      metadata:
+        name: "{{ inventory_hostname }}"
+        namespace: "{{ spoke_namespace_in_hub }}"
+      spec:
+        baseDomain: "{{ cluster_base_domain }}"
+        clusterName: "{{ cluster_name }}"
+        platform:
+          vsphere:
+            # As seen in `oc explain ClusterDeployment.spec.platform.vsphere`
+            cluster:          "{{ _vsphere_placement.cluster }}"
+            datacenter:       "{{ _vsphere_placement.dc }}"
+            defaultDatastore: "{{ _vsphere_placement.datastore }}"
+            folder: >-
+              {{ lookup("template", "vm-folder-full",
+              template_vars=dict(_vm_placement=_vsphere_placement))
+              | trim }}
+            network: "{{ _network_name }}"
+
+            vCenter:  "{{ vsphere_credentials.host }}"
+            # The objects referenced below are created by
+            # ../../roles/openshift4-hub/tasks/hub-spokes-config.yml
+            credentialsSecretRef:
+              name: spoke-vsphere-credentials
+            certificatesSecretRef:
+              name: vcenter-cert-bundle
+        provisioning:
+          imageSetRef:
+            name: "{{ spoke_clusterimageset_name }}"
+          installConfigSecretRef:
+            name: openshift-install-config
+        pullSecretRef:
+          name: spoke-pull-secret
+  vars:
+    _resources: >-
+      {{ resources_openshift_clusters[inventory_hostname] }}
+    _vsphere_placement: >-
+      {{ _resources.vsphere_placement }}
+    _network_name: >-
+      {{ _vsphere_placement.network.name }}
