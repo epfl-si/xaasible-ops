@@ -1,4 +1,8 @@
 xaasible_cache_dir: "{{ xaasible_dir }}/xaasible-state-cache"
+xaasible_pull_secret_file: "{{ xaasible_cache_dir }}/pull-secret.json"
+xaasible_pull_secret: >-
+  {{ lookup("file", xaasible_pull_secret_file)
+  | trim | string }}
 # xaasible will store Kubernetes credentials here for its own use:
 xaasible_kubeconfig: "{{ xaasible_cache_dir }}/kubeconfig-{{ inventory_hostname }}"
 xaasible_python_shim: "{{ xaasible_dir }}/ansible-deps-cache/bin/python3-shim"

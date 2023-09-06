@@ -1,0 +1,23 @@
+# Things that must be done on the operator's workstation before the
+# rest.
+
+- name: "Check whether {{ xaasible_pull_secret_file }} exists"
+  changed_when: false
+  failed_when: false
+  register: _init_pull_secret_existence
+  shell:
+    cmd: "test -f {{ xaasible_pull_secret_file }}"
+  tags:
+    - init
+    - init.pullsecret
+
+- when: _init_pull_secret_existence.rc != 0
+  include_tasks:
+    file: init-redhat-pull-secret.yml
+    apply:
+      tags:
+        - init
+        - init.pullsecret
+  tags:
+    - init
+    - init.pullsecret

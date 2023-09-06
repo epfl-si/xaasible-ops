@@ -1,3 +1,9 @@
+- name: "init: first things first"
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - role: roles/init
+
 - name: "bastion-vm: configure bastion VM(s)"
   hosts: bastions
   gather_facts: no

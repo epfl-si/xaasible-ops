@@ -18,14 +18,12 @@
   copy:
     dest: "{{ bootstrap_topdir }}/install-config.yaml"
     content: >-
-      {{ lookup("template", "ocp-bootstrap-install-config.yaml") }}
+      {{ lookup("template", "ocp-install-config.yaml") }}
   vars:
-    _redhat_pull_secret: >-
-      {{
-      lookup("file", bootstrap_pull_secret_file)
-      | trim
-      | string
-      }}
+    # The template explicitly relies on the following variables:
+    ocp_config_pull_secret: "{{ xaasible_pull_secret }}"
+    ocp_config_resources: >-
+      {{ resources_openshift_clusters[inventory_hostname] }}
 
 - name: "Create manifests under {{ bootstrap_ocp_config_dir }}/manifests"
   shell:

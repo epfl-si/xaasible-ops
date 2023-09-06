@@ -1,4 +1,24 @@
-{% set _it = resources_openshift_clusters[inventory_hostname] %}
+{# Template for the configuration file to the `openshift-install` command,
+ # used by the `openshift4-bootstrap` and `openshift4-spoke` roles.
+ #
+ # The template relies on the following variables being set:
+ #
+ # - The following variables should be set explicitly by the caller:
+ #   • ocp_config_resources
+ #   • ocp_config_pull_secret
+ #
+ # - The following variables “flow” from `inventory_hostname` (i.e.
+ #   they are specific to the cluster being configured):
+ #   • cluster_name
+ #   • cluster_base_domain
+ #   • vmware_credentials
+ #
+ # - The following variables are “global” lookup tables, and the template
+ #   explicitly walks them using `inventory_hostname` as the key:
+ #   • ssh_acls
+ #   • ssh_public_keys_people
+ #}
+{% set _it = ocp_config_resources %}
 {% set _vsphere_vm_folder = "/%s/vm/%s" % (
    _it.vsphere_placement.dc,
    _it.vsphere_placement.subfolder)
@@ -48,7 +68,7 @@ platform:
     username: {{ vsphere_credentials.user }}
     password: {{ vsphere_credentials.password }}
 publish: External
-pullSecret: '{{ _redhat_pull_secret }}'
+pullSecret: '{{ ocp_config_pull_secret }}'
 sshKey: |
 {% for person in ssh_acls[inventory_hostname] %}
 {%   for key in ssh_public_keys_people[person] | coerce_list %}
