@@ -22,3 +22,13 @@ openshift_clusters:
       hosts:
         mgmt.ocp-test.epfl.ch:
           inventory_bastion: bastion-ocp-t
+    openshift_spoke_clusters:
+      hosts:
+        iam.ocp-test.epfl.ch:
+          inventory_hub_cluster: mgmt.ocp-test.epfl.ch
+
+        fsd.ocp-test.epfl.ch:
+          inventory_hub_cluster: mgmt.ocp-test.epfl.ch
+
+        camptocamp.ocp-test.epfl.ch:
+          inventory_hub_cluster: mgmt.ocp-test.epfl.ch

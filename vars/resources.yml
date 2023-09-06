@@ -32,8 +32,61 @@ resources_openshift_clusters:
     podIPs:
       cidr: 192.168.0.0/16
       hostPrefix: 23
-    serviceIPs:
-      cidr: 172.30.0.0/16
+    serviceIPs: "{{ _common_service_ips }}"
+
+  iam.ocp-test.epfl.ch:
+    vsphere_placement: "{{ _vsphere_placements.test.iam }}"
+    architecture: amd64
+    hyperthreading: Enabled
+    workers: 3
+    masters: 3
+    apiVIPs:
+      - 10.98.31.2
+    ingressVIPs:
+      - 10.98.31.3
+    machineIPs:
+      cidr: 10.98.31.0/24
+    podIPs:
+      cidr: 192.168.0.0/16
+      hostPrefix: 23
+    serviceIPs: "{{ _common_service_ips }}"
+
+  camptocamp.ocp-test.epfl.ch:
+    vsphere_placement: "{{ _vsphere_placements.test.camptocamp }}"
+    architecture: amd64
+    hyperthreading: Enabled
+    workers: 3
+    masters: 3
+    apiVIPs:
+      - 10.98.26.2
+    ingressVIPs:
+      - 10.98.26.3
+    machineIPs:
+      cidr: 10.98.26.0/24
+    podIPs:
+      cidr: 192.168.0.0/16
+      hostPrefix: 23
+    serviceIPs: "{{ _common_service_ips }}"
+
+  fsd.ocp-test.epfl.ch:
+    vsphere_placement: "{{ _vsphere_placements.test.fsd }}"
+    architecture: amd64
+    hyperthreading: Enabled
+    workers: 3
+    masters: 3
+    apiVIPs:
+      - 10.98.64.2
+    ingressVIPs:
+      - 10.98.64.3
+    machineIPs:
+      cidr: 10.98.64.0/24
+    podIPs:
+      cidr: 192.168.0.0/16
+      hostPrefix: 23
+    serviceIPs: "{{ _common_service_ips }}"
+
+_common_service_ips:
+  cidr: 172.30.0.0/16
 
 _vsphere_placements:
   test:
@@ -44,6 +97,27 @@ _vsphere_placements:
       resource_pool: ocp-mgmt
       datastore: clstr-test-OCP-01_vsanDatastore
       network: "{{ _vsphere_networks.test.mgmt }}"
+    iam:
+      dc: ocp-test-DC
+      subfolder: ocp/production  # TODO: rename the folder
+      cluster: clstr-test-OCP-01
+      resource_pool: ocp-prod    # TODO: rename the resource pool
+      datastore: clstr-test-OCP-01_vsanDatastore
+      network: "{{ _vsphere_networks.test.iam }}"
+    camptocamp:
+      dc: ocp-test-DC
+      subfolder: ocp/development  # TODO: rename the folder
+      cluster: clstr-test-OCP-01
+      resource_pool: ocp-dev   # TODO: rename the resource pool
+      datastore: clstr-test-OCP-01_vsanDatastore
+      network: "{{ _vsphere_networks.test.camptocamp }}"
+    fsd:
+      dc: ocp-test-DC
+      subfolder: ocp/test       # TODO: rename the folder
+      cluster: clstr-test-OCP-01
+      resource_pool: ocp-test   # TODO: rename the resource pool
+      datastore: clstr-test-OCP-01_vsanDatastore
+      network: "{{ _vsphere_networks.test.fsd }}"
 
 _vsphere_networks:
   test:
@@ -52,3 +126,18 @@ _vsphere_networks:
       # ipv4:
       #  cidr: 10.98.24.0/24
       #  gateway: 10.98.24.1
+    iam:
+      name: S-VLAN-OCP-Prod-VNI12019
+      # ipv4:
+      #  cidr: 10.98.31.0/24
+      #  gateway: 10.98.31.1
+    camptocamp:
+      name: S-VLAN-OCP-Dev-VNI12018
+      # ipv4:
+      #  cidr: 10.98.26.0/24
+      #  gateway: 10.98.26.1
+    fsd:
+      name: S-VLAN-OCP-QA-VNI12020
+      # ipv4:
+      #  cidr: 10.98.64.0/24
+      #  gateway: 10.98.64.1

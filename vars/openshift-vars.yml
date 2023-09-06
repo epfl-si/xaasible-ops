@@ -1,5 +1,7 @@
 # Variables common to all openshift-* roles
 
+# TODO: once https://go.epfl.ch/INC0578533 is resolved, hopefully we can get rid of
+# the `inventory_explicit_cluster_name` variable altogether.
 cluster_name: >-
   {{
   inventory_hostname
