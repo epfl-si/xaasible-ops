@@ -1,0 +1,25 @@
+- tags: always
+  include_vars: "{{ item }}"
+  with_items:
+    - resources.yml
+    - bootstrap-vars.yml
+
+- name: Work directories for openshift-installer
+  file:
+    state: directory
+    path: "{{ item }}"
+  with_items:
+    - "{{ bootstrap_topdir }}"
+
+- name: "{{ bootstrap_topdir }}/install-config.yaml"
+  copy:
+    dest: "{{ bootstrap_topdir }}/install-config.yaml"
+    content: >-
+      {{ lookup("template", "ocp-bootstrap-install-config.yaml") }}
+  vars:
+    _redhat_pull_secret: >-
+      {{
+      lookup("file", bootstrap_pull_secret_file)
+      | trim
+      | string
+      }}

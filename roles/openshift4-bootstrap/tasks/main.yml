@@ -1,0 +1,44 @@
+- tags: always
+  include_vars: bootstrap-vars.yml
+
+- name: "Check whether {{ bootstrap_pull_secret_file }} exists"
+  changed_when: false
+  failed_when: false
+  delegate_to: localhost
+  register: _bootstrap_pull_secret_existence
+  shell:
+    cmd: "test -f {{ bootstrap_pull_secret_file }}"
+  tags:
+    - openshift
+    - openshift.bootstrap
+    - openshift.bootstrap.pullsecret
+  vars:
+    ansible_connection: local
+
+- when: _bootstrap_pull_secret_existence.rc != 0
+  include_tasks:
+    file: bootstrap-redhat-pull-secret.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.bootstrap
+        - openshift.bootstrap.pullsecret
+      delegate_to: localhost
+      vars:
+        ansible_connection: local
+  tags:
+    - openshift
+    - openshift.bootstrap
+    - openshift.bootstrap.pullsecret
+
+- include_tasks:
+    file: bootstrap-config.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.bootstrap
+        - openshift.bootstrap.config
+  tags:
+    - openshift
+    - openshift.bootstrap
+    - openshift.bootstrap.config

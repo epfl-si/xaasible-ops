@@ -1,0 +1,51 @@
+{% set _it = resources_openshift_clusters[inventory_hostname] %}
+{% set _vsphere_vm_folder = "/%s/vm/%s" % (
+   _it.vsphere_placement.dc,
+   _it.vsphere_placement.subfolder)
+%}
+{% set _vsphere_resources_folder = "/%s/host/%s/Resources/%s" % (
+   _it.vsphere_placement.dc,
+   _it.vsphere_placement.cluster,
+   _it.vsphere_placement.resource_pool)
+%}
+apiVersion: v1
+metadata:
+  name: {{ cluster_name }}
+baseDomain: {{ cluster_base_domain }}
+compute:
+- name: worker
+  architecture: {{ _it.architecture }}
+  hyperthreading: {{ _it.hyperthreading }}
+  platform: {}
+  replicas: {{ _it.workers }}
+controlPlane:
+  name: master
+  architecture: {{ _it.architecture }}
+  hyperthreading: {{ _it.hyperthreading }}
+  platform: {}
+  replicas: {{ _it.masters }}
+networking:
+  clusterNetwork:
+  - {{ _it.podIPs | to_nice_yaml | indent(4) | trim }}
+  machineNetwork:
+  - {{ _it.machineIPs | to_nice_yaml | indent(4) | trim }}
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - {{ _it.serviceIPs.cidr }}
+platform:
+  vsphere:
+    cluster: {{ _it.vsphere_placement.cluster }}
+    folder: {{ _vsphere_vm_folder }}
+    resourcePool: {{ _vsphere_resources_folder }}
+    network: {{ _it.vsphere_placement.network.name }}
+    apiVIPs:
+    {{ _it.apiVIPs | to_nice_yaml | indent(4) | trim }}
+    datacenter: {{ _it.vsphere_placement.dc }}
+    defaultDatastore: {{ _it.vsphere_placement.datastore }}
+    ingressVIPs:
+    {{ _it.ingressVIPs | to_nice_yaml | indent(4) | trim }}
+    vCenter: {{ vsphere_credentials.host }}
+    username: {{ vsphere_credentials.user }}
+    password: {{ vsphere_credentials.password }}
+publish: External
+pullSecret: '{{ _redhat_pull_secret }}'

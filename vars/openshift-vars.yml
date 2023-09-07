@@ -1,0 +1,12 @@
+# Variables common to all openshift-* roles
+
+cluster_name: >-
+  {{
+  inventory_hostname
+  | regex_replace('(^[^.]+)[.].*$', '\1')
+  }}
+cluster_base_domain: >-
+  {{
+  inventory_hostname
+  | regex_replace('^[^.]+[.]', '')
+  }}

@@ -8,3 +8,16 @@
         ansible_connection: ssh
         ansible_host_key_checking: false
         # ansible_ssh_host is set in roles/bastion-vm/tasks/bastion-get-IP.yml
+
+- name: "openshift4-bootstrap: bootstrap cluster(s) from bastions"
+  hosts: openshift_hub_clusters
+  gather_facts: no
+  roles:
+    - role: roles/openshift4-bootstrap
+      vars:
+        # During bootstrap, “steal” the Ansible / vSphere connection
+        # parameters from the underlying bastion VM:
+        ansible_host:                  "{{ hostvars[inventory_bastion].ansible_host }}"
+        ansible_user: root        # As in roles/bastion-vm, above
+        ansible_connection: ssh   # Ditto
+        vsphere_credentials: "{{ hostvars[inventory_bastion].inventory_vsphere_credentials }}"
