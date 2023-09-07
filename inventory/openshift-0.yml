@@ -15,3 +15,10 @@ bastions:
         {{ lookup("pipe", "keybase fs read " +
                           inventory_vsphere_credentials_keybase_file)
         | from_yaml }}
+
+openshift_clusters:
+  children:
+    openshift_hub_clusters:
+      hosts:
+        mgmt.ocp-test.epfl.ch:
+          inventory_bastion: bastion-ocp-t
