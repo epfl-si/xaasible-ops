@@ -62,6 +62,7 @@
       tags:
         - bastion
         - bastion.xaasctl
+        - all.xaasctl
       delegate_to: localhost
       vars:
         ansible_connection: local  # So that Ansible won't attempt to ssh
@@ -69,3 +70,4 @@
   tags:
     - bastion
     - bastion.xaasctl
+    - all.xaasctl

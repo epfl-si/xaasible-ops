@@ -28,12 +28,14 @@
       tags:
         - openshift.bootstrap
         - openshift.bootstrap.xaasctl
+        - all.xaasctl
       delegate_to: localhost
       vars:
         ansible_connection: local
   tags:
     - openshift.bootstrap
     - openshift.bootstrap.xaasctl
+    - all.xaasctl
 
 - tags: always
   name: Log in to bootstrapped cluster (through bastion)
