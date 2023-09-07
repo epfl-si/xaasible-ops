@@ -17,3 +17,5 @@
     - openshift.config.auth
     - openshift.config.ldap
     - openshift.config.oauth
+    - openshift.config.auth.lockdown
+    - all.lockdown

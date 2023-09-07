@@ -1,0 +1,8 @@
+- tags: all.lockdown
+  when: >-
+    ("all.lockdown" in ansible_run_tags)
+    and not
+    (yes_lockdown | default(False))
+  fail:
+    msg: |
+      I'm afraid I can't let you do that, Dave.

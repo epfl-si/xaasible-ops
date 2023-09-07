@@ -32,3 +32,15 @@
       by="cn", get="uniqueidentifier") }}
     _group_name: >-
       {{ openshift_oauth_admin_ldap_access_groups[inventory_hostname] }}
+
+- name: Delete the kubeadmin account (`-t all.lockdown`)
+  # The “never” tag doesn't actually work here; ask me how I know...
+  when: >-
+    ("all.lockdown" in ansible_run_tags)
+    or
+    ("openshift.config.auth.lockdown" in ansible_run_tags)
+  kubernetes.core.k8s:
+    state: absent
+    kind: Secret
+    namespace: kube-system
+    name: kubeadmin

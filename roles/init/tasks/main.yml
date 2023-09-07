@@ -1,6 +1,10 @@
 # Things that must be done on the operator's workstation before the
 # rest.
 
+- tags: always
+  include_tasks:
+    file: preflight.yml
+
 - name: "Check whether {{ xaasible_pull_secret_file }} exists"
   changed_when: false
   failed_when: false
