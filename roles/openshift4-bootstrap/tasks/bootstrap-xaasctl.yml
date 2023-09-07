@@ -29,6 +29,10 @@
 
       cluster_{{ _cluster_name_shell }}_fqdn={{ _cluster_name }}
 
+      cluster_{{ _cluster_name_shell }}_access () {
+        echo "bastion"
+      }
+
       cluster_{{ _cluster_name_shell }}_bastion_name () {
         echo {{ _cluster_vars.inventory_bastion | regex_replace('-', '_') }}
       }

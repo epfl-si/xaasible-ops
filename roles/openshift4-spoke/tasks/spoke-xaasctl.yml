@@ -1,0 +1,72 @@
+- tags: always
+  include_vars: spoke-vars.yml
+
+- name: Obtain ingress certificates
+  changed_when: false
+  shell: |
+    set -e -x
+    spew="$(openssl s_client -verify_quiet -showcerts \
+            -connect {{ _oauth_fqdn }}:443 < /dev/null)"
+    echo "$spew" | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'
+  register: _ingress_certificates
+  vars:
+    _oauth_fqdn: "oauth-openshift.apps.{{ inventory_hostname }}"
+
+- name: Obtain kubeconfigs
+  no_log: true
+  changed_when: false
+  shell:
+    cmd: |
+      set -e -x
+      secret_name="$({{ _oc_in_hub }} get secret -o name \
+                     | grep 'secret/.*-admin-kubeconfig')"
+      {{ _oc_in_hub }} extract "$secret_name" --to=-
+  register: _kubeconfig_secret
+  vars:
+    _oc_in_hub: >-
+      oc -n "{{ spoke_namespace_in_hub }}"
+
+- name: Spoke CA bundles
+  copy:
+    dest: "{{ cluster_local_ca_bundle_file }}"
+    content: >-
+      {{ _kubeconfig.clusters[0].cluster['certificate-authority-data']
+      | b64decode }}
+      {{ _ingress_certificates.stdout }}
+  vars:
+    _kubeconfig: >-
+      {{ _kubeconfig_secret.stdout | from_yaml }}
+
+- shell:
+    creates: "{{ xaasible_cache_dir }}/xaasctl-inventory.sh"
+    cmd: |
+      mkdir -p {{ xaasible_cache_dir }} || true
+      touch {{ xaasible_cache_dir }}/xaasctl-inventory.sh
+
+- name: Update xaasible-state-cache/xaasctl-inventory.sh with findings from this role
+  blockinfile:
+    path:  "{{ xaasible_cache_dir }}/xaasctl-inventory.sh"
+    marker: "# {mark} {{ inventory_hostname }} declarations from spoke-xaasctl.yml"
+    block: |
+      {% for _cluster_name in groups['openshift_spoke_clusters'] %}
+      {%   set _cluster_vars = hostvars[_cluster_name] %}
+      {%   set _cluster_name_shell = _cluster_name | regex_replace('[-.]', '_') %}
+
+      cluster_{{ _cluster_name_shell }}_fqdn={{ _cluster_name }}
+
+      cluster_{{ _cluster_name_shell }}_access () {
+        echo "spoke"
+      }
+
+      cluster_{{ _cluster_name_shell }}_cluster_hub_name () {
+        echo {{ _cluster_vars.inventory_hub_cluster | regex_replace('[-.]', '_') }}
+      }
+
+      cluster_{{ _cluster_name_shell }}_cluster_hub_namespace () {
+        echo {{ _cluster_vars.spoke_namespace_in_hub }}
+      }
+
+      cluster_{{ _cluster_name_shell }}_ca_bundle () {
+        echo "{{ _cluster_vars.cluster_local_ca_bundle_file }}"
+      }
+      {% endfor %}

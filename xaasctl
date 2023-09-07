@@ -59,17 +59,30 @@ PLEASE_RUN_XAASIBLE_FIRST
 }
 
 list_clusters () {
+    local name fqdn
     case "$1" in
         "")
             clusters | cut -d' ' -f2 ;;
         --undocumented-debug)
             clusters ;;
         -v|--verbose)
-            clusters | while read name fqdn bastion_name; do
+            clusters | while read name fqdn; do
                 echo $fqdn
-                echo -n "    bastion:    "; eval "bastion_${bastion_name}_inventory_name"
-                echo -n "    bastion IP: "; eval "bastion_ipv4_${bastion_name}"
-            done ;;
+                local access=$(eval "cluster_${name}_access")
+                echo "    access:         $access"
+                case "$access" in
+                    bastion)
+                        local bastion_name="$(eval "cluster_${name}_bastion_name")"
+                        echo -n "    bastion:        "; eval "bastion_${bastion_name}_inventory_name"
+                        echo -n "    bastion IP:     "; eval "bastion_ipv4_${bastion_name}"
+                        ;;
+                    spoke)
+                        echo -n "    hub cluster:    "; hub_fqdn_of_fqdn "$fqdn"
+                        echo -n "    hub namespace:  "; eval "cluster_${name}_cluster_hub_namespace"
+                        ;;
+                esac
+                echo
+                done ;;
         *) usage ;;
     esac
 }
@@ -78,6 +91,42 @@ log_in_to_cluster () {
     local fqdn=$1; shift
     cluster_of_fqdn "$fqdn" >/dev/null  # Checks existence
     local cluster="$(cluster_of_fqdn "$fqdn")"
+    case "$(eval "cluster_${cluster}_access")" in
+        bastion) log_in_to_cluster__bastion "$fqdn" "$@" ;;
+        spoke)   log_in_to_cluster__spoke   "$fqdn" "$@" ;;
+        *)
+            echo >&2 "Virtual dispatch whatever, something's broken!"
+            exit 1 ;;
+    esac
+}
+
+log_in_to_cluster__spoke () {
+    local fqdn=$1; shift
+    log_in_to_cluster "$(hub_fqdn_of_fqdn "$fqdn")" >/dev/null
+
+    local cluster="$(cluster_of_fqdn "$fqdn")"
+    local namespace="$(eval "cluster_${cluster}_cluster_hub_namespace")"
+    local server="$(cluster_k8s_api_endpoint "$fqdn")"
+    local ca_bundle="$(eval "cluster_${cluster}_ca_bundle")"
+
+    local secret_name
+    oc get secret -o name -n "$namespace" | while read secret_name; do
+        case "$secret_name" in
+            secret/*-admin-password)
+                local username="$(oc get -n "$namespace" "$secret_name" \
+                  -o go-template --template="{{.data.username | base64decode}}")"
+                local password="$(oc get -n "$namespace" "$secret_name" \
+                  -o go-template --template="{{.data.password | base64decode}}")"
+                oc login --certificate-authority="$ca_bundle" \
+                     -u "$username" --password="$password" --server="$server"
+                exit 0 ;;
+        esac
+    done
+}
+
+log_in_to_cluster__bastion () {
+    local fqdn=$1; shift
+    local cluster="$(cluster_of_fqdn "$fqdn")"
     local token=$(ssh_bastion_in_cluster_dir "$fqdn" 'curl -v -k --user kubeadmin:$(cat auth/kubeadmin-password) --header "X-CSRF-Token: 1" --url '"$(cluster_openshift_basicauth_endpoint "$fqdn" | sed 's/&/\\&/')"' 2>&1 | grep -o "access_token=[^\&]*" |cut -d= -f2')
     local server="$(cluster_k8s_api_endpoint "$fqdn")"
     local ca_bundle="$(eval "cluster_${cluster}_ca_bundle")"
@@ -85,6 +134,18 @@ log_in_to_cluster () {
 }
 
 destroy_cluster () {
+    local fqdn=$1; shift
+    local cluster="$(cluster_of_fqdn "$fqdn")"
+    case "$(eval "cluster_${cluster}_access")" in
+        bastion) destroy_cluster__bastion "$fqdn" "$@" ;;
+        spoke)   destroy_cluster__spoke   "$fqdn" "$@" ;;
+        *)
+            echo >&2 "Virtual dispatch whatever, something's broken!"
+            exit 1 ;;
+    esac
+}
+
+destroy_cluster__bastion () {
     local fqdn=$1; shift
     bastion_of_fqdn "$fqdn" >/dev/null  # Checks existence
     local bastion="$(bastion_of_fqdn "$fqdn")"
@@ -104,18 +165,39 @@ Would you be so kind as to copy and paste the following commands in your shell:
 
 WHOA
 }
+
+destroy_cluster__spoke () {
+    local fqdn=$1; shift
+    cluster_of_fqdn "$fqdn" >/dev/null  # Checks existence
+
+    log_in_to_cluster "$(hub_fqdn_of_fqdn "$fqdn")" >/dev/null
+
+    local cluster="$(cluster_of_fqdn "$fqdn")"
+    local ns="$(cluster_iam_ocp_test_epfl_ch_cluster_hub_namespace)"
+    cat >&2 <<WHOA
+
+Whoa.
+
+Would you be so kind as to copy and paste the following commands in your shell:
+
+   oc delete namespace $ns
+
+... cause I sure ain't doing that for you.
+
+WHOA
+}
+
 clusters () {
-    set | sed -n -e 's/^cluster_\([^=]*\)_fqdn=\(.*\)/\1 \2/p' | while read cluster_name fqdn; do
-        echo "$cluster_name $fqdn $(eval "cluster_${cluster_name}_bastion_name")"
-    done
+    set | sed -n -e 's/^cluster_\([^=]*\)_fqdn=\(.*\)/\1 \2/p'
 }
 
 bastion_of_fqdn () {
     local fqdn=$1; shift
+    local _cluster_name _fqdn
     clusters | {
-        while read _cluster_name _fqdn _response; do
+        while read _cluster_name _fqdn; do
             if [ "$fqdn" = "$_fqdn" ]; then
-                echo "$_response"
+                echo "$(eval "cluster_${_cluster_name}_bastion_name")"
                 exit 0
             fi
         done
@@ -125,8 +207,9 @@ bastion_of_fqdn () {
 
 cluster_of_fqdn () {
     local fqdn=$1; shift
+    local _cluster_name _fqdn
     clusters | {
-        while read _cluster_name _fqdn _response; do
+        while read _cluster_name _fqdn; do
             if [ "$fqdn" = "$_fqdn" ]; then
                 echo "$_cluster_name"
                 return 0
@@ -134,6 +217,18 @@ cluster_of_fqdn () {
         done
         fatal "Unknown FQDN: $fqdn - try: $0 list-clusters"
     }
+}
+
+hub_fqdn_of_fqdn () {
+    local fqdn="$1"; shift
+    local name fqdn
+    clusters | while read name fqdn_; do
+        if [ "$fqdn_" = "$fqdn" ]; then
+            local hub_cluster_name="$(eval "cluster_${name}_cluster_hub_name")"
+            eval echo \$"cluster_${hub_cluster_name}_fqdn"
+            exit 0
+        fi
+    done
 }
 
 ssh_bastion () {
