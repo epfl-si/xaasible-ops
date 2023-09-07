@@ -1,14 +1,22 @@
 ssh_acls:
   bastion-ocp-t: "{{ _access_everyone }}"
-  mgmt.ocp-test.epfl.ch: "{{ _access_everyone }}"
+  mgmt.ocp-test.epfl.ch:       "{{ _access_everyone }}"
+  iam.ocp-test.epfl.ch:        "{{ _access_everyone }}"
+  fsd.ocp-test.epfl.ch:        "{{ _access_fsd }}"
+  camptocamp.ocp-test.epfl.ch: "{{ _access_camptocamp + _access_sddc }}"
 
-_access_everyone:
+_access_camptocamp:
   - diego.abelenda@camptocamp.com
   - julien.godin@camptocamp.com
   - christophe.burki@camptocamp.com
+_access_sddc:
   - nicolas.haro@epfl.ch
   - julien.demierre@epfl.ch
+_access_fsd:
   - dominique.quatravaux@epfl.ch
   - nicolas.borboen@epfl.ch
   - julien.delasoie@epfl.ch
   - luc.venries@epfl.ch
+
+_access_everyone: >-
+  {{ _access_camptocamp + _access_fsd + _access_sddc }}
