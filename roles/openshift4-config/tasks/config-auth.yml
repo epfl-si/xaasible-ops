@@ -1,0 +1,34 @@
+- include_vars: access.yml
+
+- name: OAuth object
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: config.openshift.io/v1
+      kind: OAuth
+      metadata:
+        name: cluster
+      spec:
+        identityProviders:
+          - ldap:
+              attributes:
+                email:
+                  - mail
+                id:
+                  - dn
+                name:
+                  - cn
+                preferredUsername:
+                  - uid
+              insecure: false
+              url: >-
+                ldaps://scoldap.epfl.ch:636/o=epfl,c=ch?uid?sub?(memberof={{_sgroup}})
+            mappingMethod: claim
+            name: scoldap
+            type: LDAP
+  vars:
+    _sgroup: >-
+      {{ lookup("scoldap",
+      _group_name,
+      by="cn", get="uniqueidentifier") }}
+    _group_name: >-
+      {{ openshift_oauth_admin_ldap_access_groups[inventory_hostname] }}

@@ -5,6 +5,11 @@ ssh_acls:
   fsd.ocp-test.epfl.ch:        "{{ _access_fsd }}"
   camptocamp.ocp-test.epfl.ch: "{{ _access_camptocamp + _access_sddc }}"
 
+openshift_oauth_admin_ldap_access_groups:
+  mgmt.ocp-test.epfl.ch: ocp-test-cluster-role-cluster-login
+  fsd.ocp-test.epfl.ch: isas-fsd-openshift4
+  iam.ocp-test.epfl.ch: k8s-md-users
+
 _access_camptocamp:
   - diego.abelenda@camptocamp.com
   - julien.godin@camptocamp.com

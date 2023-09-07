@@ -1,0 +1,19 @@
+# Configuration that applies to all clusters, regardless of
+# how they popped up.
+
+- name: Set up LDAP authentication
+  include_tasks:
+    file: config-auth.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.config
+        - openshift.config.auth
+        - openshift.config.ldap
+        - openshift.config.oauth
+  tags:
+    - openshift
+    - openshift.config
+    - openshift.config.auth
+    - openshift.config.ldap
+    - openshift.config.oauth
