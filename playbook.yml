@@ -56,6 +56,17 @@
         _hub_cluster_inventory_name: >-
           {{ hostvars[inventory_hostname].inventory_hub_cluster }}
 
+- name: "openshift4-registry: install and configure the image registry"
+  hosts: openshift_clusters
+  gather_facts: no
+  roles:
+    - role: roles/openshift4-registry
+      vars:
+        ansible_connection: local
+        ansible_python_interpreter: "{{ xaasible_python_shim }}"
+      environment:
+        KUBECONFIG: "{{ xaasible_kubeconfig }}"
+
 - name: "openshift4-config: finalize clusters configuration"
   hosts: openshift_clusters
   gather_facts: no

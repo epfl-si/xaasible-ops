@@ -43,3 +43,8 @@ openshift_clusters:
 
         camptocamp.ocp-test.epfl.ch:
           inventory_hub_cluster: mgmt.ocp-test.epfl.ch
+
+# Clusters that have Quay installed
+openshift_quay_clusters:
+  hosts:
+    mgmt.ocp-test.epfl.ch:

@@ -1,0 +1,40 @@
+- include_vars: "{{ item }}"
+  with_items:
+    - quay-vars.yml
+    - versions.yml
+
+- name: "sub/quay-operator"
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: quay-operator
+        # Most (though not all) documentation to be found under
+        # https://access.redhat.com/documentation/en-us/red_hat_quay/3.9
+        # recommends installing into this namespace, whereby the
+        # operator will be granted all-namespace access by the
+        # already-existing `OperatorGroup/global-operators` of the
+        # same namespace. If we wanted to move the registry operator
+        # into its own namespace, experimentation suggests that it
+        # would require us to craft a suitable `OperatorGroup` object
+        # as well (like we do in
+        # ../../openshift4-hub/tasks/hub-operator.yml), lest the
+        # operator fail to install (status “Unknown” in the UI at
+        # Operators > Installed Operators)
+        namespace: "openshift-operators"
+      spec:
+        sourceNamespace: openshift-marketplace
+        source: redhat-operators
+        name: quay-operator
+        installPlanApproval: Automatic
+        channel: "{{ quay_channel }}"
+
+- name: Wait for QuayRegistry custom resource definition (CRD) to become available
+  register: _oc_get_quayregistry
+  until: _oc_get_quayregistry is success
+  retries: 12
+  delay: 10
+  changed_when: false
+  shell:
+      cmd: oc get QuayRegistry

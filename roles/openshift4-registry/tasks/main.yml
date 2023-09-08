@@ -1,0 +1,14 @@
+- name: Install Quay
+  when: >-
+    "openshift_quay_clusters" in group_names
+  include_tasks:
+    file: quay.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.quay
+        - openshift.quay.server
+  tags:
+    - openshift
+    - openshift.quay
+    - openshift.quay.server
