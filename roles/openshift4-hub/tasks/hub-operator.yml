@@ -53,3 +53,50 @@
   changed_when: false
   shell:
       cmd: oc get MultiClusterHub
+
+- name: RHACM MultiClusterHub
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: operator.open-cluster-management.io/v1
+      kind: MultiClusterHub
+      metadata:
+        name: multiclusterhub
+        namespace: "{{ rhacm_operator_namespace }}"
+      spec:
+        overrides:
+          components:
+            - name: console
+              enabled: true
+
+            # Regrettably, if we want Ansible to go green, we
+            # need to go through *every* feature in the feature set
+            # (and in the right order), regardless of whether we care:
+            - name: insights
+              enabled: true
+            - name: cluster-lifecycle
+              enabled: true
+            - name: volsync
+              enabled: true
+            - name: multicluster-engine
+              enabled: true
+            - name: search
+              enabled: true
+            - name: app-lifecycle
+              enabled: true
+            - name: cluster-backup
+              enabled: false
+            - name: grc
+              enabled: true
+
+- name: Wait for MultiClusterHub to be in `Running` phase
+  register: _oc_get_mch
+  until: >-
+    (_oc_get_mch is success)
+    and
+    ("Running" in _oc_get_mch.stdout)
+  retries: 20
+  delay: 30
+  changed_when: false
+  shell:
+    cmd: |
+      oc -n {{ rhacm_operator_namespace }} get mch -o=jsonpath='{.items[0].status.phase}'
