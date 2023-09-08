@@ -100,3 +100,17 @@
   shell:
     cmd: |
       oc -n {{ rhacm_operator_namespace }} get mch -o=jsonpath='{.items[0].status.phase}'
+
+- name: ClusterImageSet
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: hive.openshift.io/v1
+      kind: ClusterImageSet
+      metadata:
+        labels:
+          channel: fast
+          visible: 'false'
+        name: "{{ spoke_clusterimageset_name }}"
+      spec:
+        releaseImage: >-
+          quay.io/openshift-release-dev/ocp-release:{{ spoke_clusterimageset_version }}-x86_64

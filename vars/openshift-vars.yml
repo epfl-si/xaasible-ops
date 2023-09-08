@@ -14,3 +14,6 @@ cluster_base_domain: >-
   }}
 cluster_local_ca_bundle_file: >-
   {{ xaasible_cache_dir }}/{{ inventory_hostname }}-bundle.crt
+
+spoke_clusterimageset_name: >-
+  img{{ spoke_clusterimageset_version }}-x86-64-appsub
