@@ -136,3 +136,42 @@
       {{ _resources.vsphere_placement }}
     _network_name: >-
       {{ _vsphere_placement.network.name }}
+
+# The above is enough to get the spoke cluster going (i.e. it installs
+# and you can authenticate against it; and the “Import cluster” clicky
+# works). For “auto-import”, we need more objects in the hub cluster,
+# as seen in the following places in the documentation:
+# https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/clusters/cluster_mce_overview#cluster-lifecycle-arch
+# https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.8/html/clusters/cluster_mce_overview#importing-managed-cluster-cli
+- name: ManagedCluster object (for inter-cluster registration)
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: cluster.open-cluster-management.io/v1
+      kind: ManagedCluster
+      metadata:
+        name: "{{ spoke_namespace_in_hub }}"
+        labels:
+          cloud: auto-detect
+          vendor: auto-detect
+      spec:
+        hubAcceptsClient: true
+
+- name: KlusterletAddonConfig (declares feature set for the hub-spoke registration)
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: agent.open-cluster-management.io/v1
+      kind: KlusterletAddonConfig
+      metadata:
+        name: "{{ spoke_namespace_in_hub }}"
+        namespace: "{{ spoke_namespace_in_hub }}"
+      spec:
+        applicationManager:
+          enabled: true
+        certPolicyController:
+          enabled: true
+        iamPolicyController:
+          enabled: true
+        policyController:
+          enabled: true
+        searchCollector:
+          enabled: true
