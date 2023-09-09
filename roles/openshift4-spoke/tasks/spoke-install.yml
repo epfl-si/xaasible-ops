@@ -88,7 +88,17 @@
       apiVersion: hive.openshift.io/v1
       kind: ClusterDeployment
       metadata:
-        name: "{{ inventory_hostname }}"
+        # There appears to be some assumption somewhere in the whole
+        # RedHat enchilada of code, that ClusterDeployment objects
+        # must have the same name as the namespace they live in. At
+        # least the clicky wizard won't let you do things otherwise;
+        # and if you set e.g. `{{ inventory_hostname }}` as the name
+        # in the line below, you can't “import cluster“ — when you
+        # try, you get an error report that reads something like
+        # `fsd.ocp-test.epfl.ch: no such namespace`, which is evidence
+        # that some pod down below (not just the clicky) is making the
+        # aforementioned assumption.
+        name: "{{ spoke_namespace_in_hub }}"
         namespace: "{{ spoke_namespace_in_hub }}"
       spec:
         baseDomain: "{{ cluster_base_domain }}"
