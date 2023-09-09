@@ -1,4 +1,5 @@
 - name: Install spoke cluster
+  when: inventory_manually_created_cluster_name is not defined
   include_tasks:
     file: spoke-install.yml
     apply:
