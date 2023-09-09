@@ -1,0 +1,16 @@
+- tags: always
+  include_vars: bastion-software-vars.yml
+
+- name: "`oc` and `kubectl`"
+  shell:
+    creates: /usr/local/bin/oc # ... and /usr/local/bin/kubectl
+    cmd: >-
+      curl -s {{ oc_download_url }}
+      | tar -C/usr/local/bin -zxvf - oc kubectl
+
+- name: "`openshift-install` (💡⏳ ~600Mb binary!)"
+  shell:
+    creates: /usr/local/bin/openshift-install
+    cmd: >-
+      curl -s {{ openshift_install_download_url }}
+      | tar -C/usr/local/bin -zxvf - openshift-install
