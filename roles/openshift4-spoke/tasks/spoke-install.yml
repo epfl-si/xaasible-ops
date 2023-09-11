@@ -83,6 +83,7 @@
     ocp_config_is_for_hive: true
 
 - name: ClusterDeployment object
+  register: _spoke_clusterdeployment
   kubernetes.core.k8s:
     definition:
       apiVersion: hive.openshift.io/v1
@@ -175,3 +176,40 @@
           enabled: true
         searchCollector:
           enabled: true
+
+- run_once: true   # You don't have multiple hub clusters do you?
+  when: _spoke_clusterdeployment is changed
+  pause:
+    echo: false
+    seconds: 1
+    prompt: |
+      ==========================================================================
+
+      OpenShift installation is in progress in spoke clusters; this might take some time.
+
+      If you are bored, feel free to watch progress at
+
+          https://{{ inventory_hub_cluster }}/multicloud/infrastructure/clusters/managed
+
+      and click on the “Creating” hyperlinks to watch logs.
+
+      ==========================================================================
+
+
+- name: >-
+    {{ "Wait for the spoke cluster(s) to come up"
+    if _spoke_clusterdeployment is changed
+    else "Check that the spoke cluster(s) are up"
+    }}
+  retries: >-
+    {{ 50
+    if _spoke_clusterdeployment is changed else 1 }}
+  delay: 60
+  register: _oc_get_clusterdeployment_installed
+  until: >-
+    "true" == _oc_get_clusterdeployment_installed.stdout
+  changed_when: false
+  shell:
+    cmd: |
+      oc -n {{ spoke_namespace_in_hub }} get clusterdeployment  {{ spoke_namespace_in_hub }} \
+        -o jsonpath="{.spec.installed}"
