@@ -19,3 +19,16 @@
     - openshift.config.oauth
     - openshift.config.auth.lockdown
     - all.lockdown
+
+- name: Set up in-cluster networking
+  include_tasks:
+    file: config-network.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.config
+        - openshift.config.network
+  tags:
+    - openshift
+    - openshift.config
+    - openshift.config.network
