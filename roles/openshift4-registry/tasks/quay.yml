@@ -38,3 +38,51 @@
   changed_when: false
   shell:
       cmd: oc get QuayRegistry
+
+- name: "namespace/{{ quay_namespace }}"
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ quay_namespace }}"
+
+- name: Quay configuration (YAML)
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: si-registry-config-bundle
+        namespace: "{{ quay_namespace }}"
+      type: Opaque
+      stringData:
+        config.yaml: |
+          ALLOW_PULLS_WITHOUT_STRICT_LOGGING: false
+          AUTHENTICATION_TYPE: Database
+          DEFAULT_TAG_EXPIRATION: 2w
+          ENTERPRISE_LOGO_URL: /static/img/RH_Logo_Quay_Black_UX-horizontal.svg
+          FEATURE_BUILD_SUPPORT: false
+          FEATURE_DIRECT_LOGIN: true
+          FEATURE_MAILING: false
+          REGISTRY_TITLE: Red Hat Quay
+          REGISTRY_TITLE_SHORT: Red Hat Quay
+          SETUP_COMPLETE: true
+          TAG_EXPIRATION_OPTIONS:
+          - 2w
+          TEAM_RESYNC_STALE_TIME: 60m
+          TESTING: false
+
+- name: Quay registry
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: quay.redhat.com/v1
+      kind: QuayRegistry
+      metadata:
+        name: si-registry
+        namespace: "{{ quay_namespace }}"
+      spec:
+        configBundleSecret: si-registry-config-bundle
+      # The default configuration sets all `spec.components` to
+      # `managed: true`, except for the object storage; which is
+      # exactly what we want.
