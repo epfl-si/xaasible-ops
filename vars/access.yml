@@ -22,6 +22,9 @@ _access_fsd:
   - nicolas.borboen@epfl.ch
   - julien.delasoie@epfl.ch
   - luc.venries@epfl.ch
+  - olivier.bieler@epfl.ch
+  - giovanni.cangiani@epfl.ch
+  - lindo.duratti@epfl.ch
 
 _access_everyone: >-
   {{ _access_camptocamp + _access_fsd + _access_sddc }}
