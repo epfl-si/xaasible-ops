@@ -28,11 +28,17 @@ bastions:
         | from_yaml }}
 
 openshift_clusters:
+  vars:
+    inventory_quay_s3_credentials: >-
+        {{ lookup("pipe", "keybase fs read " +
+                          inventory_quay_s3_credentials_keybase_file)
+        | from_yaml }}
   children:
     openshift_hub_clusters:
       hosts:
         mgmt.ocp-test.epfl.ch:
           inventory_bastion: bastion-ocp-t
+          inventory_quay_s3_credentials_keybase_file: /keybase/team/epfl_idevfsd/OpenShift-4/scality-quay-bucket.yml
     openshift_spoke_clusters:
       hosts:
         iam.ocp-test.epfl.ch:
