@@ -1,0 +1,103 @@
+# https://docs.openshift.com/container-platform/4.13/networking/network_policy/default-network-policy.html#default-network-policy
+- name: "Template for new namespaces"
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: template.openshift.io/v1
+      kind: Template
+      metadata:
+        namespace: openshift-config
+        name: project-request
+      parameters:
+      - name: PROJECT_NAME
+      - name: PROJECT_DISPLAYNAME
+      - name: PROJECT_DESCRIPTION
+      - name: PROJECT_ADMIN_USER
+      - name: PROJECT_REQUESTING_USER
+      objects:
+      ################################################################################
+      # Project object
+      - apiVersion: project.openshift.io/v1
+        kind: Project
+        metadata:
+          annotations:
+            openshift.io/description: ${PROJECT_DESCRIPTION}
+            openshift.io/display-name: ${PROJECT_DISPLAYNAME}
+            openshift.io/requester: ${PROJECT_REQUESTING_USER}
+          creationTimestamp: null
+          name: ${PROJECT_NAME}
+        spec: {}
+        status: {}
+
+      ################################################################################
+      # Namespace admin permissions
+      - apiVersion: rbac.authorization.k8s.io/v1
+        kind: RoleBinding
+        metadata:
+          creationTimestamp: null
+          name: admin
+          namespace: ${PROJECT_NAME}
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: admin
+        subjects:
+        - apiGroup: rbac.authorization.k8s.io
+          kind: User
+          name: ${PROJECT_ADMIN_USER}
+
+      ################################################################################
+      # Inter-namespace network isolation
+      # https://docs.openshift.com/container-platform/4.13/networking/network_policy/multitenant-network-policy.html
+      - apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-same-namespace
+        spec:
+          podSelector:
+          ingress:
+          - from:
+            - podSelector: {}
+
+      - apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-from-openshift-ingress
+        spec:
+          policyTypes:
+          - Ingress
+          ingress:
+          - from:
+            - namespaceSelector:
+                matchLabels:
+                  policy-group.network.openshift.io/ingress: ""
+          podSelector: {}
+
+      - apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-from-kube-apiserver-operator
+        spec:
+          policyTypes:
+          - Ingress
+          ingress:
+          - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: openshift-kube-apiserver-operator
+              podSelector:
+                matchLabels:
+                  app: kube-apiserver-operator
+
+      - apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-from-monitoring
+        spec:
+          policyTypes:
+          - Ingress
+          ingress:
+          - from:
+            - namespaceSelector:
+                matchLabels:
+                  network.openshift.io/policy-group: monitoring
+          podSelector: {}

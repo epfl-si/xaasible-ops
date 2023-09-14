@@ -32,3 +32,17 @@
     - openshift
     - openshift.config
     - openshift.config.network
+
+- name: Set up template for new namespaces
+  include_tasks:
+    file: config-namespaces.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.config
+        - openshift.config.namespaces
+  tags:
+    - openshift
+    - openshift.config
+    - openshift.config.namespaces
+
