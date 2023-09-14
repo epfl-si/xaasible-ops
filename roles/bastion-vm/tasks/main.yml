@@ -1,3 +1,24 @@
+- when: >-
+    "\\" not in inventory_vsphere_credentials.user
+  pause:
+    seconds: 1
+    prompt: |
+
+      ⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠
+
+      Please use fully qualified vSphere username i.e. INTRANET\{{ _user }},
+      rather than {{ _user }}.
+
+      ⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠⚠
+
+  vars:
+    _user: >-
+      {{ inventory_vsphere_credentials.user }}
+
+- fail: {}
+  when: >-
+    "\\" not in inventory_vsphere_credentials.user
+
 - include_tasks:
     file: bastion-vm.yml
     apply:

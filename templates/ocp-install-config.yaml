@@ -65,7 +65,9 @@ platform:
     ingressVIPs:
     {{ _it.ingressVIPs | to_nice_yaml | indent(4) | trim }}
     vCenter: {{ vsphere_credentials.host }}
-    username: {{ vsphere_credentials.user }}
+    # Need heavier escaping below, as the username contains a backslash!
+    username: >-
+      {{ vsphere_credentials.user }}
     password: {{ vsphere_credentials.password }}
 publish: External
 pullSecret: '{{ ocp_config_pull_secret }}'
