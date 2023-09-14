@@ -19,7 +19,7 @@ resources_openshift_clusters:
     vsphere_placement: "{{ _vsphere_placements.test.mgmt }}"
     architecture: amd64
     hyperthreading: Enabled
-    workers: 3
+    workers: 4
     masters: 3
     apiVIPs:
       - 10.98.24.2

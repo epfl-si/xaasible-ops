@@ -1,0 +1,29 @@
+- tags: always
+  include_vars: "{{ item }}"
+  with_items:
+    - machineset-vars.yml
+    - resources.yml
+
+- name: get worker MachineSet name
+  changed_when: false
+  shell:
+    cmd: |
+      oc get -n {{ machineset_namespace }} machineset -o name | sed 's|.*/||'
+  register: _oc_get_machineset_name
+
+- name: Scale workers
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: machine.openshift.io/v1beta1
+      kind: MachineSet
+      metadata:
+        name: "{{ _oc_get_machineset_name.stdout }}"
+        namespace: "{{ machineset_namespace }}"
+      spec: "{{ _spec_yaml | from_yaml }}"
+  vars:
+    _spec_yaml: |
+      # After *decades*, neither Ansible nor Python seem to have quite
+      # grasped the difference between integers and strings.
+      replicas: {{ _num_workers }}
+    _num_workers: >-
+      {{ resources_openshift_clusters[inventory_hostname].workers }}

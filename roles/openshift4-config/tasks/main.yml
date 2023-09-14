@@ -46,3 +46,15 @@
     - openshift.config
     - openshift.config.namespaces
 
+- name: Scale clusters (if desired size changed since installation)
+  include_tasks:
+    file: config-scale.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.config
+        - openshift.config.scale
+  tags:
+    - openshift
+    - openshift.config
+    - openshift.config.scale
