@@ -24,6 +24,18 @@
     _spec_yaml: |
       # After *decades*, neither Ansible nor Python seem to have quite
       # grasped the difference between integers and strings.
-      replicas: {{ _num_workers }}
-    _num_workers: >-
-      {{ resources_openshift_clusters[inventory_hostname].workers }}
+      {% if _it.workers is defined %}
+      replicas: {{ _it.workers }}
+      {% endif %}
+      {% if (_it.cpusPerWorker is defined) or (_it.memoryPerWorkerMB is defined) %}
+      providerSpec:
+        value:
+      {% if _it.cpusPerWorker is defined %}
+          numCPUs: {{ _it.cpusPerWorker }}
+      {% endif %}
+      {% if _it.cpusPerWorker is defined %}
+          memoryMiB: {{ _it.memoryPerWorkerMB }}
+      {% endif %}
+      {% endif %}
+    _it: >-
+      {{ resources_openshift_clusters[inventory_hostname] }}

@@ -36,7 +36,14 @@ compute:
 - name: worker
   architecture: {{ _it.architecture }}
   hyperthreading: {{ _it.hyperthreading }}
-  platform: {}
+  platform:
+    vsphere:
+{% if _it.cpusPerWorker is defined %}
+      cpus: {{ _it.cpusPerWorker }}
+{% endif %}
+{% if _it.memoryPerWorkerMB is defined %}
+      memoryMB: {{ _it.memoryPerWorkerMB }}
+{% endif %}
   replicas: {{ _it.workers }}
 controlPlane:
   name: master

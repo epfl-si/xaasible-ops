@@ -20,6 +20,8 @@ resources_openshift_clusters:
     architecture: amd64
     hyperthreading: Enabled
     workers: 4
+    cpusPerWorker: 8
+    memoryPerWorkerMB: 32768
     masters: 3
     apiVIPs:
       - 10.98.24.2
