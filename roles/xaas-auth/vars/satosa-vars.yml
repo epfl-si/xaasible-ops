@@ -33,7 +33,8 @@ oidc_clients:
     client_secret: si-quay
     token_endpoint_auth_method: client_secret_post
     redirect_uris:
-    - https://si-quay.epfl.ch/
+    - https://si-quay.epfl.ch/oauth2/satosa/callback
+    - https://si-registry-quay-redhat-quay.apps.mgmt.ocp-test.epfl.ch/oauth2/satosa/callback
     response_types:
     - code
   - client_id: Matrix-FSD
