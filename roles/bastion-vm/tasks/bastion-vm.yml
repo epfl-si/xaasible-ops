@@ -1,5 +1,9 @@
 - tags: always
-  include_vars: bastion-vsphere-vars.yml
+  include_vars: "{{ item }}"
+  with_items:
+    - bastion-access-vars.yml
+    - ssh-public-keys.yml
+    - bastion-vsphere-vars.yml
 
 - name: '{{ bastion_vsphere_ova_image_local_copy | dirname }}'
   delegate_to: localhost
@@ -14,17 +18,26 @@
 
 - name: Bastion VM
   community.vmware.vmware_deploy_ovf:
+    name: '{{ inventory_hostname }}'
     hostname: '{{ inventory_vsphere_credentials.host }}'
     username: '{{ inventory_vsphere_credentials.user }}'
     password: '{{ inventory_vsphere_credentials.password }}'
-    name: '{{ inventory_hostname }}'
-    datacenter: '{{ _vm_placement.dc }}'
-    folder: '/{{ _vm_placement.dc }}/vm/{{ _vm_placement.subfolder }}'
-    cluster: '{{ _vm_placement.cluster }}'
-    datastore: '{{ _vm_placement.datastore }}'
-    resource_pool: '{{ _vm_placement.resource_pool }}'
-    networks: "{u'VM Network':u'{{ _vm_placement.network.name }}'}"
+
+    datacenter: '{{ bastion_vm_placement.dc }}'
+    folder: '{{ bastion_vm_placement_folder_full }}'
+    cluster: '{{ bastion_vm_placement.cluster }}'
+    datastore: '{{ bastion_vm_placement.datastore }}'
+    resource_pool: '{{ bastion_vm_placement.resource_pool }}'
+    networks: "{u'VM Network':u'{{ bastion_vm_placement.network.name }}'}"
     ovf: '{{ bastion_vsphere_ova_image_local_copy }}'
     power_on: true
-  vars:
-    _vm_placement: '{{ bastion_vsphere_vms[inventory_vsphere_name] }}'
+    wait_for_ip_address: true
+    inject_ovf_env: true  # Otherwise “properties” below has no effect; ask
+                          # me how I know
+    properties:
+      public-keys: |
+        {% for authorized in bastion_ssh_acls[inventory_hostname] %}
+        {%   for key in ssh_public_keys_people[authorized] | coerce_list %}
+        {{ key }} {{ authorized }}
+        {%   endfor %}
+        {% endfor %}

@@ -3,3 +3,8 @@
   gather_facts: no
   roles:
     - role: roles/bastion-vm
+      vars:
+        ansible_user: root
+        ansible_connection: ssh
+        ansible_host_key_checking: false
+        # ansible_ssh_host is set in roles/bastion-vm/tasks/bastion-get-IP.yml
