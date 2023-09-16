@@ -29,3 +29,8 @@ oidc_clients:
     - https://lhdv3.epfl.ch/
     response_types:
     - code
+  - client_id: si-quay
+    redirect_uris:
+    - https://si-quay.epfl.ch/
+    response_types:
+    - code
