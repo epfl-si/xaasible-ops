@@ -30,6 +30,8 @@ oidc_clients:
     response_types:
     - code
   - client_id: si-quay
+    client_secret: si-quay
+    token_endpoint_auth_method: client_secret_post
     redirect_uris:
     - https://si-quay.epfl.ch/
     response_types:
