@@ -56,6 +56,10 @@ attributes:
     saml: [sn]
     openid: [family_name]
 
+  preferred_username:
+    saml: [uid]
+    openid: [preferred_username]
+
   epflGroups:
     saml: [epflGroups]
     openid: [groups]
