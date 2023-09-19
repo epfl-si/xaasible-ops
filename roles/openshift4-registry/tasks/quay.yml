@@ -63,6 +63,8 @@
       type: Opaque
       stringData:
         config.yaml: |
+          SERVER_HOSTNAME: {{ quay_hostname }}
+
           # https://access.redhat.com/documentation/fr-fr/red_hat_quay/3/html/configure_red_hat_quay/config-fields-intro#config-fields-storage-aws
           DISTRIBUTED_STORAGE_CONFIG:
             s3Storage:
@@ -87,6 +89,7 @@
                 - openid
                 - email
                 - profile
+
           {# The remainder below was cargo-culted from the operator's
            # default configuration: #}
           ALLOW_PULLS_WITHOUT_STRICT_LOGGING: false
