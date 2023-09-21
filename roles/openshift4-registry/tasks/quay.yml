@@ -118,3 +118,16 @@
       # The default configuration sets all `spec.components` to
       # `managed: true`, except for the object storage; which is
       # exactly what we want.
+  register: _quay_registry
+
+- name: Wait for Quay pods to go into running state
+  changed_when: false
+  register: _oc_exec_quay_app
+  retries: >-
+    {{ 20
+    if _quay_registry is changed else 1 }}
+  delay: 60
+  until: _oc_exec_quay_app is success
+  shell:
+    cmd: |
+      oc -n {{ quay_namespace}} exec -it {{ quay_pod_names[0] }} -- true
