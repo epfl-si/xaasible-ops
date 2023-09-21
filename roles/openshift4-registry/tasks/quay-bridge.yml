@@ -1,0 +1,28 @@
+- include_vars: "{{ item }}"
+  with_items:
+    - quay-vars.yml
+    - versions.yml
+
+- name: "sub/quay-bridge-operator"
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: quay-bridge-operator
+        namespace: "openshift-operators"
+      spec:
+        sourceNamespace: openshift-marketplace
+        source: redhat-operators
+        name: quay-bridge-operator
+        installPlanApproval: Automatic
+        channel: "{{ quay_bridge_channel }}"
+
+- name: Wait for QuayIntegration custom resource definition (CRD) to become available
+  register: _oc_get_quayintegration
+  until: _oc_get_quayintegration is success
+  retries: 12
+  delay: 10
+  changed_when: false
+  shell:
+      cmd: oc get QuayIntegration

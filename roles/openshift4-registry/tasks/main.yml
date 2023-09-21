@@ -12,3 +12,16 @@
     - openshift
     - openshift.quay
     - openshift.quay.server
+
+- name: Install Quay bridge
+  include_tasks:
+    file: quay-bridge.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.quay
+        - openshift.quay.bridge
+  tags:
+    - openshift
+    - openshift.quay
+    - openshift.quay.bridge
