@@ -47,3 +47,15 @@
   vars:
     ansible_connection: local
     ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+- include_tasks:
+    file: spoke-backdoor.yml
+    apply:
+      tags:
+        - openshift
+        - openshift.spoke
+        - openshift.spoke.backdoor
+  tags:
+    - openshift
+    - openshift.spoke
+    - openshift.spoke.backdoor

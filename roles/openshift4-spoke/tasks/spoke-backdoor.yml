@@ -1,0 +1,81 @@
+- tags: always
+  include_vars: spoke-vars.yml
+
+- name: Obtain spoke kubeadmin password
+  changed_when: false
+  shell:
+    cmd: |
+      set -e -x
+      namespace="{{ spoke_namespace_in_hub }}"
+      export KUBECONFIG="{{ hostvars[inventory_hub_cluster].xaasible_kubeconfig }}"
+      oc get secret -o name -n "$namespace" | (while read secret_name; do
+          case "$secret_name" in
+            secret/*-admin-password)
+      {% raw %}
+                oc get -n "$namespace" "$secret_name" \
+                  -o go-template --template="{{.data.password }}"
+      {% endraw %}
+                exit 0 ;;
+          esac
+        done; exit 1)
+  register: _oc_get_spoke_kubeadmin_password_base64_encoded
+
+- name: Stick password into `secret/kubeadmin` of namespace `kube-system`
+  kubernetes.core.k8s:
+    definition:
+      kind: Secret
+      apiVersion: v1
+      metadata:
+        name: kubeadmin
+        namespace: kube-system
+      data:
+        kubeadmin-cleartext: >-
+          {{ _oc_get_spoke_kubeadmin_password_base64_encoded.stdout }}
+  register: _secret_kubeadmin
+
+# Changing the secret invalidates the current token, which I guess is a good thing.
+- name: Log in to hub cluster again (if necessary)
+  when: _secret_kubeadmin is changed
+  changed_when: false
+  shell:
+    cmd: |
+      env KUBECONFIG={{ xaasible_kubeconfig }} ./xaasctl login-cluster {{ inventory_hostname }}
+  vars:
+    ansible_connection: local
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+
+- name: "`Role` that grants read-only access to the kubeadmin Secret"
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        namespace: kube-system
+        name: kubeadmin-backdoor
+        ownerReferences:
+        - "{{ spoke_kubeadmin_ownerReference }}"
+      rules:
+      - apiGroups: [""]
+        resources: ["secrets"]
+        verbs: ["get", "list"]
+        resourceNames:
+        - kubeadmin
+
+- name: "`RoleBinding` that lets anyone logged in read the kubeadmin Secret"
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        namespace: kube-system
+        name: kubeadmin-backdoor
+        ownerReferences:
+        - "{{ spoke_kubeadmin_ownerReference }}"
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: kubeadmin-backdoor
+      subjects:
+      - apiGroup: rbac.authorization.k8s.io
+        kind: Group
+        name: system:authenticated:oauth

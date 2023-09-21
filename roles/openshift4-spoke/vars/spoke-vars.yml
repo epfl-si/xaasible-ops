@@ -3,3 +3,12 @@ spoke_namespace_in_hub: >-
   | default("managed-cluster-%s" %
   (inventory_hostname | regex_replace("\..*$", "")))
   }}
+
+spoke_kubeadmin_ownerReference:
+  apiVersion: v1
+  kind: Secret
+  name: kubeadmin
+  uid: >-
+    {{ lookup("pipe",
+    "KUBECONFIG={{ xaasible_kubeconfig }} oc -n kube-system get secret kubeadmin
+    -o jsonpath='{.metadata.uid}'") }}
