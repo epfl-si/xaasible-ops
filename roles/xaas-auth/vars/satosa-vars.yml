@@ -42,3 +42,8 @@ oidc_clients:
     - https://matrix-fsd.epfl.ch/
     response_types:
     - code
+  - client_id: ATARI
+    redirect_uris:
+    - https://itsidevfsd0024.xaas.epfl.ch/
+    response_types:
+    - code
