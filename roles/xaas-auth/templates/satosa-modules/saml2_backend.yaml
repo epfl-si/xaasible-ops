@@ -19,7 +19,6 @@ config:
     metadata:
       remote:
         - url: "{{ satosa_tequila_saml_metadata_url }}"
-          cert: /tequila-secrets/tequila-cert.pem
 
     accepted_time_diff: 60
     service:

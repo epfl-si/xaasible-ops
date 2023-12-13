@@ -1,7 +1,7 @@
 - name: Generate '{{ _key }}'
   shell:
-    creates: '{{ satosa_keybase.oidc_private_key }}'
-    cmd: openssl genrsa 2048 > {{ satosa_keybase.oidc_private_key }}
+    creates: '{{ _key }}'
+    cmd: "openssl genrsa 2048 > {{ _key }}"
   tags: satosa.keys
 
 - name: Generate '{{ _cert }}'
