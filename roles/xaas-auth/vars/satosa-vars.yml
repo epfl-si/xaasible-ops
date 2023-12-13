@@ -44,6 +44,6 @@ oidc_clients:
     - code
   - client_id: ATARI
     redirect_uris:
-    - https://itsidevfsd0024.xaas.epfl.ch/
+    - https://atari-test.epfl.ch/
     response_types:
     - code
