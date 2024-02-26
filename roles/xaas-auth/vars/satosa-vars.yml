@@ -12,6 +12,10 @@ satosa_tech_support_email: 1234@epfl.ch
 satosa_tequila_hostname_short: tequila
 satosa_tequila_hostname: "{{ satosa_tequila_hostname_short }}.epfl.ch"
 
+satosa_tequila_tag: v1.0.9
+satosa_tequila_zip_url: >-
+  https://github.com/epfl-si/satosa-tequila/archive/refs/tags/{{ satosa_tequila_tag }}.zip
+
 satosa_keybase:
   oidc_private_key: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/frontend.key
   oidc_certificate: /keybase/team/epfl_idevfsd/svc0176idevfsdkt0001/frontend.crt
@@ -47,3 +51,5 @@ oidc_clients:
     - https://atari-test.epfl.ch/
     response_types:
     - code
+    tequila_requires:
+      - group: "ATARI-access"
