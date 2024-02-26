@@ -120,8 +120,6 @@ spec:
             - name: config
               subPath: clients.json
               mountPath: /data/clients.json
-            - name: signing-keys
-              mountPath: /tls
           ## Uncomment the following lines to get a running (albeit useless) pod for debugging purposes:
 #          command:
 #            - bash
