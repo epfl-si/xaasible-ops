@@ -112,6 +112,8 @@ spec:
               mountPath: /proxy_conf.yaml
             - name: config
               mountPath: /site-python/epfl
+            - name: attributemaps
+              mountPath: /attributemaps
             - name: config
               subPath: tequila_attributes.py
               mountPath: /attributemaps/tequila_attributes.py
@@ -141,6 +143,8 @@ spec:
         - containerPort: 8080
           name: http
       volumes:
+        - name: attributemaps
+          emptyDir: {}
         - name: config
           configMap:
             name: satosa
