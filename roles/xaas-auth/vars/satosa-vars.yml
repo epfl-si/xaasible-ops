@@ -46,9 +46,16 @@ oidc_clients:
     - https://matrix-fsd.epfl.ch/
     response_types:
     - code
-  - client_id: ATARI
+  - client_id: ATARI-test
     redirect_uris:
     - https://atari-test.epfl.ch/
+    response_types:
+    - code
+    tequila_requires:
+      - group: "ATARI-access"
+  - client_id: ATARI
+    redirect_uris:
+    - https://atari.epfl.ch/
     response_types:
     - code
     tequila_requires:
