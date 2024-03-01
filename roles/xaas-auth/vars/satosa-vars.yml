@@ -53,3 +53,10 @@ oidc_clients:
     - code
     tequila_requires:
       - group: "ATARI-access"
+  - client_id: ATARI
+    redirect_uris:
+    - https://atari.epfl.ch/
+    response_types:
+    - code
+    tequila_requires:
+      - group: "ATARI-access"
